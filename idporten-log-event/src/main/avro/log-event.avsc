@@ -1,0 +1,34 @@
+{
+  "namespace": "no.idporten.logging.event",
+  "type": "record",
+  "name": "EventRecord",
+  "doc": "Represents an event to log",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "name of the event, typically a type of change"
+    },
+    {
+      "name": "pid",
+      "type": [
+        "string",
+        "null"
+      ],
+      "doc": "person identifier"
+    },
+    {
+      "name": "correlation_id",
+      "type": "string",
+      "doc": "identifier for tracking related events"
+    },
+    {
+      "name": "service",
+      "type": [
+        "string",
+        "null"
+      ],
+      "doc": "application generating the event"
+    }
+  ]
+}
