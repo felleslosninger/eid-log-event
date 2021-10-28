@@ -5,12 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Data
@@ -43,6 +46,10 @@ public class EventLoggingConfig {
                         entry -> String.valueOf(entry.getValue())));
     }
 
+    static BiFunction<String, Object, Object> replaceIfSet(final String value) {
+        return (k, v) -> value == null ? v : value;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> configMap = new HashMap<>();
 
@@ -57,6 +64,12 @@ public class EventLoggingConfig {
         configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
         configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl);
         configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+
+        // security
+        configMap.compute(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, replaceIfSet(bootstrapServers));
+        configMap.compute(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, replaceIfSet(securityProtocol));
+        configMap.compute(SaslConfigs.SASL_MECHANISM, replaceIfSet(saslMechanism));
+        configMap.compute(SaslConfigs.SASL_JAAS_CONFIG, replaceIfSet(saslJaasConfig));
 
         return configMap;
     }
