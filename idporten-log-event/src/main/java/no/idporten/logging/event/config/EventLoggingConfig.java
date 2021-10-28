@@ -29,6 +29,11 @@ public class EventLoggingConfig {
     @NonNull
     private String eventTopic;
 
+    private String bootstrapServers;
+    private String securityProtocol;
+    private String saslMechanism;
+    private String saslJaasConfig;
+
     private Properties properties;
 
     private static Map<String, ?> convertToMap(Properties properties) {
