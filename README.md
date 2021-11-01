@@ -19,9 +19,7 @@ import no.idporten.logging.event.config.EventLogger;
 import no.idporten.logging.event.config.EventLoggingConfig;
 [...]
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .keySerializer(StringSerializer.class.getName())
-                .valueSerializer(KafkaAvroSerializer.class.getName())
-                .brokerUrl(BROKER_HOST_AND_PORT)
+                .bootstrapServers(BROKER_HOST_AND_PORT)
                 .schemaRegistryUrl(REGISTRY_HOST_AND_PORT)
                 .eventTopic(EVENT_TOPIC)
                 .build();

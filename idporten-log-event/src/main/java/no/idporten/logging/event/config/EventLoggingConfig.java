@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 
@@ -13,7 +12,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Data
@@ -21,22 +19,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventLoggingConfig {
     private static final String PROPERTIES_FILE_PATH = "kafka.properties";
+    private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
+            "required username=\"%s\" password=\"%s\";";
     @NonNull
-    private String keySerializer;
-    @NonNull
-    private String valueSerializer;
-    @NonNull
-    private String brokerUrl;
+    private String bootstrapServers;
     @NonNull
     private String schemaRegistryUrl;
     @NonNull
     private String eventTopic;
-
-    private String bootstrapServers;
-    private String securityProtocol;
-    private String saslMechanism;
-    private String saslJaasConfig;
-
+    private String username;
+    private String password;
     private Properties properties;
 
     private static Map<String, ?> convertToMap(Properties properties) {
@@ -46,30 +38,23 @@ public class EventLoggingConfig {
                         entry -> String.valueOf(entry.getValue())));
     }
 
-    static BiFunction<String, Object, Object> replaceIfSet(final String value) {
-        return (k, v) -> value == null ? v : value;
-    }
-
     public Map<String, Object> toMap() {
         Map<String, Object> configMap = new HashMap<>();
 
-        // basic properties
         properties = loadProperties();
         if (properties != null && !properties.isEmpty()) {
             configMap.putAll(convertToMap(properties));
         }
 
-        // required configuration
-        configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
-        configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl);
-        configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+        if (username != null && !username.isEmpty()) {
+            configMap.put(
+                    SaslConfigs.SASL_JAAS_CONFIG,
+                    String.format(JAAS_CONFIG_TEMPLATE, username, password != null ? password : ""));
+        }
 
-        // security
-        configMap.compute(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, replaceIfSet(bootstrapServers));
-        configMap.compute(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, replaceIfSet(securityProtocol));
-        configMap.compute(SaslConfigs.SASL_MECHANISM, replaceIfSet(saslMechanism));
-        configMap.compute(SaslConfigs.SASL_JAAS_CONFIG, replaceIfSet(saslJaasConfig));
+        // required configuration
+        configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
 
         return configMap;
     }

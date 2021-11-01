@@ -1,7 +1,6 @@
 package no.idporten.logging.event;
 
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.idporten.logging.event.config.EventLoggingConfig;
 import org.apache.kafka.clients.producer.MockProducer;
@@ -31,9 +30,7 @@ class EventLoggerTest {
     @BeforeEach
     void setUp() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .keySerializer(StringSerializer.class.getName())
-                .valueSerializer(KafkaAvroSerializer.class.getName())
-                .brokerUrl(DUMMY_URL)
+                .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .eventTopic(EVENT_TOPIC)
                 .build();
