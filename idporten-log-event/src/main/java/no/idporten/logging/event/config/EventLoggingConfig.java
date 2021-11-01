@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventLoggingConfig {
     private static final String PROPERTIES_FILE_PATH = "kafka.properties";
+    private static final String EVENT_TOPIC_KEY = "event.topic";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
     @NonNull
@@ -26,9 +27,9 @@ public class EventLoggingConfig {
     @NonNull
     private String schemaRegistryUrl;
     @NonNull
-    private String eventTopic;
     private String username;
     private String password;
+    private String eventTopic;
     private Properties properties;
 
     private static Map<String, ?> convertToMap(Properties properties) {
@@ -46,15 +47,18 @@ public class EventLoggingConfig {
             configMap.putAll(convertToMap(properties));
         }
 
-        if (username != null && !username.isEmpty()) {
-            configMap.put(
-                    SaslConfigs.SASL_JAAS_CONFIG,
-                    String.format(JAAS_CONFIG_TEMPLATE, username, password != null ? password : ""));
-        }
-
         // required configuration
         configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+        configMap.put(
+                SaslConfigs.SASL_JAAS_CONFIG,
+                String.format(JAAS_CONFIG_TEMPLATE, username, password != null ? password : ""));
+
+        if (eventTopic != null && !eventTopic.isEmpty()) {
+            configMap.put(EVENT_TOPIC_KEY, eventTopic);
+        } else {
+            eventTopic = (String) configMap.get(EVENT_TOPIC_KEY);
+        }
 
         return configMap;
     }

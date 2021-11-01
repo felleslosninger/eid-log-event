@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class EventLoggerTest {
 
     private static final String DUMMY_URL = "example.com:80";
-    private static final String EVENT_TOPIC = "aktiviteter";
+    private static final String USERNAME = "username";
     EventLogger eventLogger;
 
     @BeforeEach
@@ -32,7 +32,7 @@ class EventLoggerTest {
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
-                .eventTopic(EVENT_TOPIC)
+                .username(USERNAME)
                 .build();
 
         MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
