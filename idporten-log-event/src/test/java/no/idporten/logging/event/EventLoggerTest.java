@@ -1,7 +1,6 @@
 package no.idporten.logging.event;
 
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.idporten.logging.event.config.EventLoggingConfig;
 import org.apache.kafka.clients.producer.MockProducer;
@@ -25,17 +24,15 @@ import static org.mockito.Mockito.when;
 class EventLoggerTest {
 
     private static final String DUMMY_URL = "example.com:80";
-    private static final String EVENT_TOPIC = "aktiviteter";
+    private static final String USERNAME = "username";
     EventLogger eventLogger;
 
     @BeforeEach
     void setUp() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .keySerializer(StringSerializer.class.getName())
-                .valueSerializer(KafkaAvroSerializer.class.getName())
-                .brokerUrl(DUMMY_URL)
+                .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
-                .eventTopic(EVENT_TOPIC)
+                .username(USERNAME)
                 .build();
 
         MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();

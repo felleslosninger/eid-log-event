@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -18,17 +19,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventLoggingConfig {
     private static final String PROPERTIES_FILE_PATH = "kafka.properties";
+    private static final String EVENT_TOPIC_KEY = "event.topic";
+    private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
+            "required username=\"%s\" password=\"%s\";";
     @NonNull
-    private String keySerializer;
-    @NonNull
-    private String valueSerializer;
-    @NonNull
-    private String brokerUrl;
+    private String bootstrapServers;
     @NonNull
     private String schemaRegistryUrl;
     @NonNull
+    private String username;
+    private String password;
     private String eventTopic;
-
     private Properties properties;
 
     private static Map<String, ?> convertToMap(Properties properties) {
@@ -41,17 +42,23 @@ public class EventLoggingConfig {
     public Map<String, Object> toMap() {
         Map<String, Object> configMap = new HashMap<>();
 
-        // basic properties
         properties = loadProperties();
         if (properties != null && !properties.isEmpty()) {
             configMap.putAll(convertToMap(properties));
         }
 
         // required configuration
-        configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
-        configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl);
+        configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+        configMap.put(
+                SaslConfigs.SASL_JAAS_CONFIG,
+                String.format(JAAS_CONFIG_TEMPLATE, username, password != null ? password : ""));
+
+        if (eventTopic != null && !eventTopic.isEmpty()) {
+            configMap.put(EVENT_TOPIC_KEY, eventTopic);
+        } else {
+            eventTopic = (String) configMap.get(EVENT_TOPIC_KEY);
+        }
 
         return configMap;
     }
