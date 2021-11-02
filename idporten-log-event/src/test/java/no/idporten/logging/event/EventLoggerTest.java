@@ -8,13 +8,14 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,9 +24,11 @@ import static org.mockito.Mockito.when;
 
 class EventLoggerTest {
 
-    private static final String DUMMY_URL = "example.com:80";
+    private static final String DUMMY_URL = "https://localhost:443";
     private static final String USERNAME = "username";
-    EventLogger eventLogger;
+    private static final String FNR = "25079494081";
+    private final ExecutorService pool = Executors.newSingleThreadExecutor();
+    private EventLogger eventLogger;
 
     @BeforeEach
     void setUp() {
@@ -39,46 +42,44 @@ class EventLoggerTest {
         SpecificAvroSerde<EventRecord> serde = new SpecificAvroSerde<>(schemaRegistryClient);
         serde.configure(config.toMap(), false);
 
-        eventLogger = new EventLogger(config);
+        eventLogger = new EventLogger(config, pool);
+        eventLogger.producer.close();
         eventLogger.producer = new MockProducer<>(true, new StringSerializer(), serde.serializer());
     }
 
     @Test
-    void log() {
+    void log() throws ExecutionException, InterruptedException {
         EventRecord record = EventRecord.newBuilder()
                 .setName("Innlogget")
-                .setPid("25079494081")
+                .setPid(FNR)
                 .setCorrelationId(UUID.randomUUID().toString())
                 .setService("idPorten")
                 .build();
 
         eventLogger.log(record);
+        eventLogger.producer.flush();
+        MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
+        Future<Integer> sentEventsfuture = pool.submit(() -> mockProducer.history().size());
 
-        if (ForkJoinPool.commonPool().awaitQuiescence(1, TimeUnit.SECONDS)) { // wait for async completion
-            MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
-            assertEquals(1, mockProducer.history().size(), "Record should be published");
-        }
+        assertEquals(1, sentEventsfuture.get(), "Record should be published");
+        assertEquals(FNR, mockProducer.history().get(0).key(), "Record key should be the PID");
     }
 
     @Test
     void logWhenFailure() {
         EventRecord record = EventRecord.newBuilder()
                 .setName("Innlogget")
-                .setPid("25079494081")
+                .setPid(FNR)
                 .setCorrelationId(UUID.randomUUID().toString())
                 .setService("idPorten")
                 .build();
 
         Producer<String, EventRecord> producerMock = mock(Producer.class);
         when(producerMock.send(any(ProducerRecord.class)))
-                .thenThrow(new KafkaException("Kafka down"));
+                .thenThrow(new KafkaException("Simulating Kafka down"));
         eventLogger.producer = producerMock;
 
         eventLogger.log(record);
     }
 
-    @AfterEach
-    void tearDown() {
-        eventLogger.finalize();
-    }
 }

@@ -1,8 +1,10 @@
 package no.idporten.logging.event.config;
 
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -16,20 +18,44 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class EventLoggingConfig {
     private static final String PROPERTIES_FILE_PATH = "kafka.properties";
     private static final String EVENT_TOPIC_KEY = "event.topic";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
+
+    /**
+     * Host and port of the kafka broker(s) <BR>
+     * (comma-separated list in the case of multiple servers)
+     */
     @NonNull
     private String bootstrapServers;
+
+    /**
+     * Host and port of the Schema Registry (Confluent)
+     */
     @NonNull
     private String schemaRegistryUrl;
+
+    /**
+     * Login for the JAAS SASL configuration
+     */
     @NonNull
     private String username;
+
+    /**
+     * Password for the JAAS SASL configuration
+     */
     private String password;
+
+    /**
+     * Kafka topic to publish to
+     */
     private String eventTopic;
+
     private Properties properties;
 
     private static Map<String, ?> convertToMap(Properties properties) {
