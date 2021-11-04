@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 
@@ -27,8 +28,10 @@ public class EventLoggingConfig {
     @NonNull
     private String schemaRegistryUrl;
     @NonNull
-    private String username;
-    private String password;
+    private String kafkaUsername;
+    private String kafkaPassword;
+    private String schemaRegistryUsername;
+    private String schemaRegistryPassword;
     private String eventTopic;
     private Properties properties;
 
@@ -50,9 +53,19 @@ public class EventLoggingConfig {
         // required configuration
         configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+
+        if (!StringUtils.isEmpty(schemaRegistryUsername)) {
+            configMap.put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+            configMap.put(
+                    KafkaAvroSerializerConfig.USER_INFO_CONFIG,
+                    String.format("%s:%s", schemaRegistryUsername, schemaRegistryPassword != null ? schemaRegistryPassword : "")
+            );
+        } else {
+            configMap.put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "URL");
+        }
         configMap.put(
                 SaslConfigs.SASL_JAAS_CONFIG,
-                String.format(JAAS_CONFIG_TEMPLATE, username, password != null ? password : ""));
+                String.format(JAAS_CONFIG_TEMPLATE, kafkaUsername, kafkaPassword != null ? kafkaPassword : ""));
 
         if (eventTopic != null && !eventTopic.isEmpty()) {
             configMap.put(EVENT_TOPIC_KEY, eventTopic);

@@ -32,7 +32,7 @@ class EventLoggerTest {
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
-                .username(USERNAME)
+                .kafkaUsername(USERNAME)
                 .build();
 
         MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
