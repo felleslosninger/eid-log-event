@@ -7,17 +7,17 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class EventLogger {
-    private final ExecutorService executorService;
+    final ExecutorService pool = Executors.newSingleThreadExecutor();
     private final EventLoggingConfig config;
     Producer<String, EventRecord> producer;
 
-    public EventLogger(EventLoggingConfig eventLoggingConfig, ExecutorService executorService) {
+    public EventLogger(EventLoggingConfig eventLoggingConfig) {
         this.config = eventLoggingConfig;
         this.producer = new KafkaProducer<>(config.toMap());
-        this.executorService = executorService;
     }
 
     public void log(EventRecord eventRecord) {
@@ -32,7 +32,7 @@ public class EventLogger {
             }
         };
 
-        executorService.submit(task);
+        pool.submit(task);
     }
 
     @Override

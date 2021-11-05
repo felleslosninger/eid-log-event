@@ -90,19 +90,23 @@ public class EventLoggingConfig {
         configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
 
         if (!StringUtils.isEmpty(schemaRegistryUsername)) {
-            configMap.put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
+            configMap.put(
+                    KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
+                    BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
             configMap.put(
                     KafkaAvroSerializerConfig.USER_INFO_CONFIG,
                     String.format("%s:%s", schemaRegistryUsername, schemaRegistryPassword != null ? schemaRegistryPassword : "")
             );
         } else {
-            configMap.put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT);
+            configMap.put(
+                    KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
+                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT);
         }
         configMap.put(
                 SaslConfigs.SASL_JAAS_CONFIG,
                 String.format(JAAS_CONFIG_TEMPLATE, kafkaUsername, kafkaPassword != null ? kafkaPassword : ""));
 
-        if (eventTopic != null && !eventTopic.isEmpty()) {
+        if (!StringUtils.isEmpty(eventTopic)) {
             configMap.put(EVENT_TOPIC_KEY, eventTopic);
         } else {
             eventTopic = (String) configMap.get(EVENT_TOPIC_KEY);
