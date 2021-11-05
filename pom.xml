@@ -23,7 +23,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>6.2.1-ce</kafka.version>
-        <confluent.version>6.2.1</confluent.version>
+        <confluent.version>7.0.0</confluent.version>
         <lombok.version>1.18.22</lombok.version>
         <avro.version>1.11.0</avro.version>
         <junit.version>5.8.1</junit.version>
