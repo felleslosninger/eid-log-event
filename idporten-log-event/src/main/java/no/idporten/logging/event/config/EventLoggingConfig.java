@@ -2,7 +2,11 @@ package no.idporten.logging.event.config;
 
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -20,12 +24,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class EventLoggingConfig {
+    static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     private static final String PROPERTIES_FILE_PATH = "kafka.properties";
     private static final String EVENT_TOPIC_KEY = "event.topic";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
-    static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
-
     /**
      * Host and port of the kafka broker(s) <BR>
      * (comma-separated list in the case of multiple servers)

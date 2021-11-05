@@ -3,7 +3,9 @@
 Library for publishing events to a pre-defined Kafka topic.
 
 ### Build
+
 Import the library with Maven:
+
 ```xml
     <dependency>
         <groupId>no.idporten.logging</groupId>
@@ -13,7 +15,9 @@ Import the library with Maven:
 ```
 
 ### Configuration
+
 Use `EventLoggingConfig.builder()` to configure settings:
+
 ```java
 import no.idporten.logging.event.config.EventLogger;
 import no.idporten.logging.event.config.EventLoggingConfig;
@@ -29,7 +33,9 @@ import no.idporten.logging.event.config.EventLoggingConfig;
 ```
 
 ### Usage
+
 Use `EventRecord.newBuilder()` to create an entry to publish:
+
 ```java
 import no.idporten.logging.event.config.EventRecord;
 [...]
