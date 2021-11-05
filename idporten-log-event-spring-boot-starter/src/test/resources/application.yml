@@ -1,0 +1,6 @@
+digdir:
+  event:
+    logging:
+      bootstrap-servers: example.com:80
+      schema-registry-url: example.com:80
+      username: kafka
