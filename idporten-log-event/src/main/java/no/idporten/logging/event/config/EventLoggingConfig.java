@@ -53,7 +53,8 @@ public class EventLoggingConfig {
     private String kafkaPassword;
 
     /**
-     * Username for the schemaRegistry, leave empty for no authentication
+     * Username for the Schema Registry, leave empty for no authentication
+
      */
     private String schemaRegistryUsername;
 
