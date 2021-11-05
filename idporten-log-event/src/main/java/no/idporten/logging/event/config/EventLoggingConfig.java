@@ -58,7 +58,8 @@ public class EventLoggingConfig {
     private String schemaRegistryUsername;
 
     /**
-     * Password for he schemaRegistry
+     * Password for the Schema Registry
+
      */
     private String schemaRegistryPassword;
 
