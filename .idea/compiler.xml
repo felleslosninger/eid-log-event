@@ -7,11 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="idporten-log-event-starter" />
         <module name="idporten-log-event" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="idporten-log-event-starter" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>
