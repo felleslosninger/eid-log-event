@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +24,6 @@ class EventLoggerTest {
     private static final String DUMMY_URL = "https://localhost:443";
     private static final String USERNAME = "username";
     private static final String FNR = "25079494081";
-    private final ExecutorService pool = Executors.newSingleThreadExecutor();
     private EventLogger eventLogger;
 
     @BeforeEach
@@ -41,7 +38,7 @@ class EventLoggerTest {
         SpecificAvroSerde<EventRecord> serde = new SpecificAvroSerde<>(schemaRegistryClient);
         serde.configure(config.toMap(), false);
 
-        eventLogger = new EventLogger(config, pool);
+        eventLogger = new EventLogger(config);
         eventLogger.producer.close();
         eventLogger.producer = new MockProducer<>(true, new StringSerializer(), serde.serializer());
     }
@@ -58,7 +55,7 @@ class EventLoggerTest {
         eventLogger.log(record);
         eventLogger.producer.flush();
         MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
-        Future<Integer> sentEventsFuture = pool.submit(() -> mockProducer.history().size());
+        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
         assertEquals(FNR, mockProducer.history().get(0).key(), "Record key should be the PID");

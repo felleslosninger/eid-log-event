@@ -3,4 +3,8 @@ digdir:
     logging:
       bootstrap-servers: example.com:80
       schema-registry-url: example.com:80
-      username: kafka
+      kafka-username: franz
+
+spring:
+  main:
+    banner-mode: off
