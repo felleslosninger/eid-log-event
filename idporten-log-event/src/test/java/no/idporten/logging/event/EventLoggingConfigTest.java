@@ -1,10 +1,10 @@
-package no.idporten.logging.event.config;
+package no.idporten.logging.event;
 
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import org.junit.jupiter.api.Test;
 
-import static no.idporten.logging.event.config.EventLoggingConfig.BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO;
+import static no.idporten.logging.event.EventLoggingConfig.BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EventLoggingConfigTest {
