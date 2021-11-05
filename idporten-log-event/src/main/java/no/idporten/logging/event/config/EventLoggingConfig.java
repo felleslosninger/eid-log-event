@@ -1,12 +1,10 @@
 package no.idporten.logging.event.config;
 
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 
@@ -26,6 +24,7 @@ public class EventLoggingConfig {
     private static final String EVENT_TOPIC_KEY = "event.topic";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
+    static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
 
     /**
      * Host and port of the kafka broker(s) <BR>
@@ -44,12 +43,22 @@ public class EventLoggingConfig {
      * Login for the JAAS SASL configuration
      */
     @NonNull
-    private String username;
+    private String kafkaUsername;
 
     /**
      * Password for the JAAS SASL configuration
      */
-    private String password;
+    private String kafkaPassword;
+
+    /**
+     * Username for the Schema Registry, leave empty for no authentication
+     */
+    private String schemaRegistryUsername;
+
+    /**
+     * Password for the Schema Registry
+     */
+    private String schemaRegistryPassword;
 
     /**
      * Kafka topic to publish to
@@ -76,9 +85,19 @@ public class EventLoggingConfig {
         // required configuration
         configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+
+        if (!StringUtils.isEmpty(schemaRegistryUsername)) {
+            configMap.put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
+            configMap.put(
+                    KafkaAvroSerializerConfig.USER_INFO_CONFIG,
+                    String.format("%s:%s", schemaRegistryUsername, schemaRegistryPassword != null ? schemaRegistryPassword : "")
+            );
+        } else {
+            configMap.put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT);
+        }
         configMap.put(
                 SaslConfigs.SASL_JAAS_CONFIG,
-                String.format(JAAS_CONFIG_TEMPLATE, username, password != null ? password : ""));
+                String.format(JAAS_CONFIG_TEMPLATE, kafkaUsername, kafkaPassword != null ? kafkaPassword : ""));
 
         if (eventTopic != null && !eventTopic.isEmpty()) {
             configMap.put(EVENT_TOPIC_KEY, eventTopic);
