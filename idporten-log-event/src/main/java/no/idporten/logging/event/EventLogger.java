@@ -6,28 +6,33 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 @Slf4j
 public class EventLogger {
-    EventLoggingConfig config;
+    private final ExecutorService executorService;
+    private final EventLoggingConfig config;
     Producer<String, EventRecord> producer;
 
-    public EventLogger(EventLoggingConfig eventLoggingConfig) {
-        config = eventLoggingConfig;
-        producer = new KafkaProducer<>(config.toMap());
+    public EventLogger(EventLoggingConfig eventLoggingConfig, ExecutorService executorService) {
+        this.config = eventLoggingConfig;
+        this.producer = new KafkaProducer<>(config.toMap());
+        this.executorService = executorService;
     }
 
     public void log(EventRecord eventRecord) {
         ProducerRecord<String, EventRecord> producerRecord =
                 new ProducerRecord<>(config.getEventTopic(), eventRecord.getPid().toString(), eventRecord);
 
-        CompletableFuture
-                .runAsync(() -> producer.send(producerRecord))
-                .exceptionally(e -> {
-                    log.warn("Failed to publish event {}", eventRecord, e);
-                    return null;
-                });
+        Runnable task = () -> {
+            try {
+                producer.send(producerRecord);
+            } catch (Exception e) {
+                log.warn("Failed to publish event {}", eventRecord, e);
+            }
+        };
+
+        executorService.submit(task);
     }
 
     @Override
