@@ -1,7 +1,6 @@
 package no.idporten.logging.event;
 
 import lombok.extern.slf4j.Slf4j;
-import no.idporten.logging.event.config.EventLoggingConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

@@ -23,7 +23,7 @@ Use `EventLoggingConfig.builder()` to configure settings:
 
 ```java
 import no.idporten.logging.event.config.EventLogger;
-import no.idporten.logging.event.config.EventLoggingConfig;
+import no.idporten.logging.event.EventLoggingConfig;
 [...]
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .bootstrapServers(BROKER_HOST_AND_PORT)

@@ -1,8 +1,5 @@
-package no.idporten.logging.event.config;
+package no.idporten.logging.event;
 
-import no.idporten.logging.event.ApplicationTest;
-import no.idporten.logging.event.EventLogger;
-import no.idporten.logging.event.EventRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -11,7 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(classes = ApplicationTest.class)
 @ContextConfiguration(
@@ -25,7 +22,7 @@ class EventLoggingConfigFactoryTest {
 
     @Test
     void propertyIsSet() {
-        assertTrue(eventLoggingConfig.getBootstrapServers() != null);
+        assertNotNull(eventLoggingConfig.getBootstrapServers());
     }
 
     @Test

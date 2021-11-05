@@ -2,7 +2,6 @@ package no.idporten.logging.event;
 
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
-import no.idporten.logging.event.config.EventLoggingConfig;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -56,12 +55,13 @@ class EventLoggerTest {
         eventLogger.log(record);
         eventLogger.producer.flush();
         MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
-        Future<Integer> sentEventsfuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
 
-        assertEquals(1, sentEventsfuture.get(), "Record should be published");
+        assertEquals(1, sentEventsFuture.get(), "Record should be published");
         assertEquals(FNR, mockProducer.history().get(0).key(), "Record key should be the PID");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void logWhenFailure() {
         EventRecord record = EventRecord.newBuilder()
