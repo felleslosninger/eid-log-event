@@ -18,7 +18,7 @@ import java.util.UUID;
 @ContextConfiguration(
         classes = EventLoggingConfigFactory.class,
         initializers = ConfigDataApplicationContextInitializer.class)
-public class EventLoggingDisabledFactoryTest {
+class EventLoggingDisabledFactoryTest {
     @Autowired
     EventLogger eventLogger;
 

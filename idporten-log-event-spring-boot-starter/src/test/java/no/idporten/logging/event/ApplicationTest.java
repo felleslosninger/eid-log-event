@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
  * Test application for loading autoconfigured context
  */
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
-public class ApplicationTest {
+class ApplicationTest {
 
     public static void main(String[] args) {
         SpringApplication.run(ApplicationTest.class, args);
