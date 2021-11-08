@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>idporten-log-event-starter</name>
-    <artifactId>idporten-log-event-starter</artifactId>
+    <name>idporten-log-event-spring-boot-starter</name>
+    <artifactId>idporten-log-event-spring-boot-starter</artifactId>
 
     <parent>
         <artifactId>idporten-log-event-parent</artifactId>
