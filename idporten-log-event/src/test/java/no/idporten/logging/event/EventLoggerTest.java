@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,12 @@ class EventLoggerTest {
     private static final String DUMMY_URL = "https://localhost:443";
     private static final String USERNAME = "username";
     private static final String FNR = "25079494081";
+    private final EventRecord record = EventRecord.newBuilder()
+            .setName("Innlogget")
+            .setPid(FNR)
+            .setCorrelationId(UUID.randomUUID().toString())
+            .setService("idPorten")
+            .build();
     private EventLogger eventLogger;
 
     @BeforeEach
@@ -45,13 +52,6 @@ class EventLoggerTest {
 
     @Test
     void log() throws ExecutionException, InterruptedException {
-        EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid(FNR)
-                .setCorrelationId(UUID.randomUUID().toString())
-                .setService("idPorten")
-                .build();
-
         eventLogger.log(record);
         eventLogger.producer.flush();
         MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
@@ -64,13 +64,6 @@ class EventLoggerTest {
     @SuppressWarnings("unchecked")
     @Test
     void logWhenFailure() {
-        EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid(FNR)
-                .setCorrelationId(UUID.randomUUID().toString())
-                .setService("idPorten")
-                .build();
-
         Producer<String, EventRecord> producerMock = mock(Producer.class);
         when(producerMock.send(any(ProducerRecord.class)))
                 .thenThrow(new KafkaException("Simulating Kafka down"));
@@ -79,4 +72,19 @@ class EventLoggerTest {
         eventLogger.log(record);
     }
 
+    @Test
+    void noLoggingWhenDisabled() {
+        EventLoggingConfig disablingconfig = EventLoggingConfig.builder()
+                .bootstrapServers(DUMMY_URL)
+                .schemaRegistryUrl(DUMMY_URL)
+                .kafkaUsername(USERNAME)
+                .eventTopic("any topic")
+                .featureEnabled(false)
+                .build();
+
+        eventLogger = new EventLogger(disablingconfig);
+        eventLogger.log(record);
+        eventLogger.producer.flush();
+        assertTrue(eventLogger.producer instanceof NoLoggingProducer, "Logger should be non-logging");
+    }
 }
