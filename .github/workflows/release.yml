@@ -1,3 +1,5 @@
+name: Release to Artifactory
+
 on:
   workflow_dispatch:
     inputs:
@@ -9,6 +11,7 @@ on:
         description: "Default version to use for new local working copy."
         required: true
         default: "0.0.1-SNAPSHOT"
+
 jobs:
   release:
     runs-on: ubuntu-latest
