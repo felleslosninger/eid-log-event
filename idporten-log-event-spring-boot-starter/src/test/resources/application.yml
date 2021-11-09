@@ -1,8 +1,8 @@
 digdir:
   event:
     logging:
-      bootstrap-servers: example.com:80
-      schema-registry-url: example.com:80
+      bootstrap-servers: localhost:443
+      schema-registry-url: localhost:443
       kafka-username: franz
 
 spring:
