@@ -10,7 +10,7 @@ on:
       developmentVersion:
         description: "Default version to use for new local working copy."
         required: true
-        default: "0.0.1-SNAPSHOT"
+        default: "0.0.2-SNAPSHOT"
 
 jobs:
   release:
@@ -41,4 +41,4 @@ jobs:
           git config user.name "GitHub Actions"
 
       - name: Maven Release
-        run: mvn release:prepare release:perform -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+        run: mvn release:prepare release:perform -X -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
