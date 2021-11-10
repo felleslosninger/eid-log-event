@@ -69,9 +69,7 @@ public class EventLoggingConfig {
      * Kafka topic to publish to
      */
     private final String eventTopic;
-
     private final Map<String, Object> producerConfig;
-    private final Properties eventLoggerDefaultProperties;
 
     @Builder
     public EventLoggingConfig(
@@ -89,12 +87,21 @@ public class EventLoggingConfig {
         this.kafkaPassword = kafkaPassword;
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
-        this.eventTopic = eventTopic;
-        this.eventLoggerDefaultProperties = loadPropertiesFromFile(EVENT_LOGGER_PROPERTIES_FILE_PATH);
+        this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
+
+        Properties eventLoggerDefaultProperties = loadPropertiesFromFile(EVENT_LOGGER_PROPERTIES_FILE_PATH);
+        this.eventTopic = determineEventTopic(eventTopic, eventLoggerDefaultProperties);
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(
                 Boolean.valueOf(eventLoggerDefaultProperties.getProperty(FEATURE_ENABLED_KEY, "true"))
         );
-        this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
+    }
+
+    private String determineEventTopic(String userSpecifiedEventTopic, Properties defaultProperties) {
+        if (isEmpty(userSpecifiedEventTopic)) {
+            return Objects.requireNonNull(defaultProperties.getProperty(EVENT_TOPIC_KEY), "No default eventTopic found");
+        } else {
+            return userSpecifiedEventTopic;
+        }
     }
 
     private static Map<String, ?> propertiesToMap(Properties properties) {
@@ -146,11 +153,7 @@ public class EventLoggingConfig {
     }
 
     public String getEventTopic() {
-        if (isEmpty(eventTopic)) {
-            return Objects.requireNonNull(eventLoggerDefaultProperties.getProperty(EVENT_TOPIC_KEY), "No default eventTopic found");
-        } else {
-            return eventTopic;
-        }
+        return eventTopic;
     }
 
     public boolean isFeatureEnabled() {
