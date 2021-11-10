@@ -39,6 +39,7 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+          git config remote.origin.url "https://${{EID_BUILD_PAT}}@github.com/felleslosninger/idporten-log-event.git
 
       - name: Maven Release
         run: mvn release:prepare release:perform -X -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
