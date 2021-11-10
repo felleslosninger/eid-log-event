@@ -1,10 +1,15 @@
 package no.idporten.logging.event;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
+import java.util.Optional;
+
 @ConfigurationProperties(prefix = "digdir.event.logging")
 @ConstructorBinding
+@Getter(AccessLevel.PACKAGE)
 class EventLoggingConfigurationProperties {
     private final boolean featureEnabled;
     private final String bootstrapServers;
@@ -16,13 +21,15 @@ class EventLoggingConfigurationProperties {
     private final String eventTopic;
 
     EventLoggingConfigurationProperties(
-            boolean featureEnabled,
+            Boolean featureEnabled,
             String bootstrapServers,
             String schemaRegistryUrl,
             String kafkaUsername,
             String kafkaPassword,
-            String schemaRegistryUsername, String schemaRegistryPassword, String eventTopic) {
-        this.featureEnabled = featureEnabled;
+            String schemaRegistryUsername,
+            String schemaRegistryPassword,
+            String eventTopic) {
+        this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistryUrl;
         this.kafkaUsername = kafkaUsername;
@@ -30,37 +37,5 @@ class EventLoggingConfigurationProperties {
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
         this.eventTopic = eventTopic;
-    }
-
-    boolean isFeatureEnabled() {
-        return featureEnabled;
-    }
-
-    String getBootstrapServers() {
-        return bootstrapServers;
-    }
-
-    String getSchemaRegistryUrl() {
-        return schemaRegistryUrl;
-    }
-
-    String getKafkaUsername() {
-        return kafkaUsername;
-    }
-
-    String getKafkaPassword() {
-        return kafkaPassword;
-    }
-
-    String getSchemaRegistryUsername() {
-        return schemaRegistryUsername;
-    }
-
-    String getSchemaRegistryPassword() {
-        return schemaRegistryPassword;
-    }
-
-    String getEventTopic() {
-        return eventTopic;
     }
 }
