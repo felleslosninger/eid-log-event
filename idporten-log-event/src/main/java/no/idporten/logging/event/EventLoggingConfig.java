@@ -91,7 +91,7 @@ public class EventLoggingConfig {
         this.schemaRegistryPassword = schemaRegistryPassword;
         this.eventTopic = eventTopic;
         this.defaultProperties = loadDefaultPropertiesFromKafkaPropertiesFile();
-        this.producerConfig = Collections.unmodifiableMap(createCreateProducerConfig(defaultProperties));
+        this.producerConfig = Collections.unmodifiableMap(createProducerConfig(defaultProperties));
     }
 
     private static Map<String, ?> extractProducerConfigFromProperties(Properties properties) {
@@ -102,7 +102,7 @@ public class EventLoggingConfig {
                         entry -> String.valueOf(entry.getValue())));
     }
 
-    private Map<String, Object> createCreateProducerConfig(Properties defaultProperties) {
+    private Map<String, Object> createProducerConfig(Properties defaultProperties) {
         Map<String, Object> producerConfig = new HashMap<>(extractProducerConfigFromProperties(defaultProperties));
         producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
