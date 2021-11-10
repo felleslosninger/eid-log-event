@@ -42,3 +42,6 @@ jobs:
 
       - name: Maven Release
         run: mvn release:prepare release:perform -X -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+        env:
+          CI_DEPLOY_USERNAME: ${{ secrets.MAVEN_USER }}
+          CI_DEPLOY_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
