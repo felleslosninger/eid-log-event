@@ -10,7 +10,7 @@
     <parent>
         <artifactId>idporten-log-event-parent</artifactId>
         <groupId>no.idporten.logging</groupId>
-        <version>DEV-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
