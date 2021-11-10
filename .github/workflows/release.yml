@@ -1,4 +1,4 @@
-name: Release to Artifactory
+name: Release to GitHub Packages
 
 on:
   workflow_dispatch:
@@ -6,11 +6,11 @@ on:
       releaseVersion:
         description: "Default version to use when preparing a release."
         required: true
-        default: "0.0.1"
+        default: "0.0.2"
       developmentVersion:
         description: "Default version to use for new local working copy."
         required: true
-        default: "0.0.1-SNAPSHOT"
+        default: "0.0.3-SNAPSHOT"
 
 jobs:
   release:
@@ -24,16 +24,15 @@ jobs:
           distribution: 'zulu'
           java-version: '8'
           cache: maven
+          server-id: github
 
-      - name: Set up Maven settings
-        uses: s4u/maven-settings-action@v2.2.0
-        with:
-          servers: |
-            [{
-            "id": "digdir-artifactory",
-            "username": "${{ secrets.MAVEN_USER }}",
-            "password": "${{ secrets.MAVEN_PASSWORD }}"
-            }]
+      - name: Configure Git User (for Maven Release)
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
 
-      - name: Maven Release
-        run: mvn release:prepare release:perform -B -s .maven_settings.xml -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+      - name: Maven release
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: mvn release:prepare release:perform -U -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} -Dusername="${{env.GITHUB_ACTOR}}" -Dpassword="${{env.GITHUB_TOKEN}}"
