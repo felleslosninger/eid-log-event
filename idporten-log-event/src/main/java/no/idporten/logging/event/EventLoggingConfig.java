@@ -2,147 +2,155 @@ package no.idporten.logging.event;
 
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Slf4j
 public class EventLoggingConfig {
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
+    static final String EVENT_TOPIC_KEY = "event.topic";
     private static final String PROPERTIES_FILE_PATH = "kafka.properties";
-    private static final String EVENT_TOPIC_KEY = "event.topic";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
     /**
      * Feature toggle
      */
-    @Builder.Default
-    private boolean featureEnabled = true;
+    private final boolean featureEnabled;
+
     /**
      * Host and port of the kafka broker(s) <BR>
      * (comma-separated list in the case of multiple servers)
      */
-    @NonNull
-    private String bootstrapServers;
+    private final String bootstrapServers;
 
     /**
      * Host and port of the Schema Registry (Confluent)
      */
-    @NonNull
-    private String schemaRegistryUrl;
+    private final String schemaRegistryUrl;
 
     /**
      * Login for the JAAS SASL configuration
      */
-    @NonNull
-    private String kafkaUsername;
+    private final String kafkaUsername;
 
     /**
      * Password for the JAAS SASL configuration
      */
-    private String kafkaPassword;
+    private final String kafkaPassword;
 
     /**
      * Username for the Schema Registry, leave empty for no authentication
      */
-    private String schemaRegistryUsername;
+    private final String schemaRegistryUsername;
 
     /**
      * Password for the Schema Registry
      */
-    private String schemaRegistryPassword;
+    private final String schemaRegistryPassword;
 
     /**
      * Kafka topic to publish to
      */
-    private String eventTopic;
+    private final String eventTopic;
 
-    private Properties properties;
+    private final Map<String, Object> producerConfig;
+    private final Properties defaultProperties;
 
-    private static Map<String, ?> convertToMap(Properties properties) {
+    @Builder
+    public EventLoggingConfig(
+            Boolean featureEnabled,
+            @NonNull String bootstrapServers,
+            @NonNull String schemaRegistryUrl,
+            @NonNull String kafkaUsername,
+            String kafkaPassword,
+            String schemaRegistryUsername,
+            String schemaRegistryPassword,
+            String eventTopic) {
+        this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
+        this.bootstrapServers = bootstrapServers;
+        this.schemaRegistryUrl = schemaRegistryUrl;
+        this.kafkaUsername = kafkaUsername;
+        this.kafkaPassword = kafkaPassword;
+        this.schemaRegistryUsername = schemaRegistryUsername;
+        this.schemaRegistryPassword = schemaRegistryPassword;
+        this.eventTopic = eventTopic;
+        this.defaultProperties = loadDefaultPropertiesFromKafkaPropertiesFile();
+        this.producerConfig = Collections.unmodifiableMap(createCreateProducerConfig(defaultProperties));
+    }
+
+    private static Map<String, ?> extractProducerConfigFromProperties(Properties properties) {
         return properties.entrySet().stream()
+                .filter(entry -> !entry.getKey().equals(EVENT_TOPIC_KEY))
                 .collect(Collectors.toMap(
                         entry -> String.valueOf(entry.getKey()),
                         entry -> String.valueOf(entry.getValue())));
     }
 
-    Map<String, Object> toMap() {
-        Map<String, Object> configMap = new HashMap<>();
-
-        properties = loadProperties();
-        if (properties != null && !properties.isEmpty()) {
-            configMap.putAll(convertToMap(properties));
-        }
-
-        if (configMap.containsKey(FEATURE_ENABLED_KEY)
-                && !(Boolean.parseBoolean((String) configMap.get(FEATURE_ENABLED_KEY)))) {
-            featureEnabled = false;
-            configMap.remove(FEATURE_ENABLED_KEY);
-        }
-
-        if (isEmpty(eventTopic)) {
-            eventTopic = (String) configMap.get(EVENT_TOPIC_KEY);
-        }
-        configMap.remove(EVENT_TOPIC_KEY);
-
-        return buildProducerConfigFrom(configMap);
-    }
-
-    private Map<String, Object> buildProducerConfigFrom(Map<String, Object> configMap) {
-        configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configMap.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-
+    private Map<String, Object> createCreateProducerConfig(Properties defaultProperties) {
+        Map<String, Object> producerConfig = new HashMap<>(extractProducerConfigFromProperties(defaultProperties));
+        producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
         if (!isEmpty(schemaRegistryUsername)) {
-            configMap.put(
+            producerConfig.put(
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
                     BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
-            configMap.put(
+            producerConfig.put(
                     KafkaAvroSerializerConfig.USER_INFO_CONFIG,
                     String.format("%s:%s", schemaRegistryUsername, defaultIfEmpty(schemaRegistryPassword, "")));
         } else {
-            configMap.put(
+            producerConfig.put(
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
                     AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT);
         }
-        configMap.put(
+        producerConfig.put(
                 SaslConfigs.SASL_JAAS_CONFIG,
                 String.format(JAAS_CONFIG_TEMPLATE, kafkaUsername, kafkaPassword != null ? kafkaPassword : ""));
 
-        return configMap;
+
+        return producerConfig;
     }
 
-    private Properties loadProperties() {
-        if (properties == null) {
-            properties = new Properties();
-        }
+    private Properties loadDefaultPropertiesFromKafkaPropertiesFile() {
+        Properties defaultProperties = new Properties();
 
-        if (properties.isEmpty()) {
-            try {
-                InputStream propertiesStream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE_PATH);
-                properties.load(propertiesStream);
-            } catch (Exception e) {
-                log.warn("Failed to load properties from {}", PROPERTIES_FILE_PATH, e);
-            }
+        try {
+            InputStream propertiesStream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE_PATH);
+            defaultProperties.load(propertiesStream);
+        } catch (Exception e) {
+            log.warn("Failed to load properties from {}", PROPERTIES_FILE_PATH, e);
         }
-        return properties;
+        return defaultProperties;
+    }
+
+    public Map<String, Object> getProducerConfig() {
+        return producerConfig;
+    }
+
+    public String getEventTopic() {
+        if (isEmpty(eventTopic)) {
+            return Objects.requireNonNull(defaultProperties.getProperty(EVENT_TOPIC_KEY), "No default eventTopic found");
+        } else {
+            return eventTopic;
+        }
+    }
+
+    public boolean isFeatureEnabled() {
+        return featureEnabled;
     }
 }
