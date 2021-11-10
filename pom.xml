@@ -27,7 +27,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+        <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version>
         <artifactory-maven-plugin.version>3.3.0</artifactory-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>artifactory</project.scm.id>
