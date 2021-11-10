@@ -25,7 +25,8 @@ public class EventLoggingConfig {
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String EVENT_TOPIC_KEY = "event.topic";
-    private static final String PROPERTIES_FILE_PATH = "kafka.properties";
+    private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
+    private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
     /**
@@ -70,7 +71,7 @@ public class EventLoggingConfig {
     private final String eventTopic;
 
     private final Map<String, Object> producerConfig;
-    private final Properties defaultProperties;
+    private final Properties eventLoggerDefaultProperties;
 
     @Builder
     public EventLoggingConfig(
@@ -82,7 +83,6 @@ public class EventLoggingConfig {
             String schemaRegistryUsername,
             String schemaRegistryPassword,
             String eventTopic) {
-        this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistryUrl;
         this.kafkaUsername = kafkaUsername;
@@ -90,20 +90,23 @@ public class EventLoggingConfig {
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
         this.eventTopic = eventTopic;
-        this.defaultProperties = loadDefaultPropertiesFromKafkaPropertiesFile();
-        this.producerConfig = Collections.unmodifiableMap(createProducerConfig(defaultProperties));
+        this.eventLoggerDefaultProperties = loadPropertiesFromFile(EVENT_LOGGER_PROPERTIES_FILE_PATH);
+        this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(
+                Boolean.valueOf(eventLoggerDefaultProperties.getProperty(FEATURE_ENABLED_KEY, "true"))
+        );
+        this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
     }
 
-    private static Map<String, ?> extractProducerConfigFromProperties(Properties properties) {
+    private static Map<String, ?> propertiesToMap(Properties properties) {
         return properties.entrySet().stream()
-                .filter(entry -> !entry.getKey().equals(EVENT_TOPIC_KEY))
                 .collect(Collectors.toMap(
                         entry -> String.valueOf(entry.getKey()),
                         entry -> String.valueOf(entry.getValue())));
     }
 
-    private Map<String, Object> createProducerConfig(Properties defaultProperties) {
-        Map<String, Object> producerConfig = new HashMap<>(extractProducerConfigFromProperties(defaultProperties));
+    private Map<String, Object> createProducerConfig() {
+        Properties kafkaProducerProperties = loadPropertiesFromFile(PRODUCER_PROPERTIES_FILE_PATH);
+        Map<String, Object> producerConfig = new HashMap<>(propertiesToMap(kafkaProducerProperties));
         producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
         if (!isEmpty(schemaRegistryUsername)) {
@@ -126,16 +129,16 @@ public class EventLoggingConfig {
         return producerConfig;
     }
 
-    private Properties loadDefaultPropertiesFromKafkaPropertiesFile() {
-        Properties defaultProperties = new Properties();
+    private Properties loadPropertiesFromFile(String propertiesFilePath) {
+        Properties properties = new Properties();
 
         try {
-            InputStream propertiesStream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE_PATH);
-            defaultProperties.load(propertiesStream);
+            InputStream propertiesStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
+            properties.load(propertiesStream);
         } catch (Exception e) {
-            log.warn("Failed to load properties from {}", PROPERTIES_FILE_PATH, e);
+            log.warn("Failed to load properties from {}", propertiesFilePath, e);
         }
-        return defaultProperties;
+        return properties;
     }
 
     public Map<String, Object> getProducerConfig() {
@@ -144,7 +147,7 @@ public class EventLoggingConfig {
 
     public String getEventTopic() {
         if (isEmpty(eventTopic)) {
-            return Objects.requireNonNull(defaultProperties.getProperty(EVENT_TOPIC_KEY), "No default eventTopic found");
+            return Objects.requireNonNull(eventLoggerDefaultProperties.getProperty(EVENT_TOPIC_KEY), "No default eventTopic found");
         } else {
             return eventTopic;
         }
