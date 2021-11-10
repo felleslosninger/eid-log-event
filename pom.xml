@@ -6,7 +6,7 @@
     <artifactId>idporten-log-event-parent</artifactId>
     <groupId>no.idporten.logging</groupId>
     <packaging>pom</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <modules>
         <module>idporten-log-event</module>
@@ -170,4 +170,19 @@
             <url>https://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
+
+    <!-- Repository we deploy to -->
+    <distributionManagement>
+        <repository>
+            <id>eid-releases</id>
+            <name>Idporten Releases</name>
+            <url>${artifactory.url}/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>eid-snapshots</id>
+            <name>Idporten Snapshots</name>
+            <url>${artifactory.url}/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
