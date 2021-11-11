@@ -27,16 +27,22 @@ jobs:
           server-id: github
           settings-path: ${{ github.workspace }}
 
-      - name: Build with Maven
-        run: mvn -B package
+  - name: Build and Test
+      uses: qcastel/github-actions-maven-cmd@v1
+      with:
+        maven-args: "clean install"
 
-      - name: Configure Git User
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
+  - name: Release
+      uses: qcastel/github-actions-maven-release@v1
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-1.8-openjdk/
+      with:
+        maven-project-folder: "idporten-log-event/"
+        maven-repo-server-id: github
+        maven-repo-server-username: ${{ secrets.MAVEN_USER }}
+        maven-repo-server-password: ${{ secrets.MAVEN_PASSWORD }}
+        access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        git-release-bot-name: "github-action"
+        git-release-bot-email: "actions@github.com"
 
-      - name: Maven Release
-        run: mvn release:prepare release:perform -X -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
+        maven-args: "-DskipTests"
