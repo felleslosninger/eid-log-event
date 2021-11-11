@@ -27,21 +27,24 @@ jobs:
           server-id: github
           settings-path: ${{ github.workspace }}
 
-      - name: Build and Test
-        uses: qcastel/github-actions-maven-cmd@master
-        with:
-          maven-args: "clean install"
+      - name: Build with Maven
+        run: mvn -B -U package
 
       - name: Release
-        uses: qcastel/github-actions-maven-release@master
-        env:
-          JAVA_HOME: /usr/lib/jvm/java-1.8-openjdk/
+        uses: mg-smartrent/github-actions-maven-release@master
         with:
+          release-branch-name: "issue-25"
+          git-release-bot-name: "github-action"
+          git-release-bot-email: "actions@github.com"
+          access-token: ${GITHUB_TOKEN}
+
+          # Release
           maven-repo-server-id: github
           maven-repo-server-username: ${{ secrets.MAVEN_USER }}
           maven-repo-server-password: ${{ secrets.MAVEN_PASSWORD }}
-          access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          git-release-bot-name: "github-action"
-          git-release-bot-email: "actions@github.com"
-          maven-args: "-DskipTests"
-          release-branch-name: "issue-25"
+          maven-release-args: "-Dskip.unit.tests=true -Dskip.integration.tests=true"
+
+          # Publish artifacts to GitHub Packages
+          maven-publish-args: "-Dskip.unit.tests=true -Dskip.integration.tests=true"
+          maven-release-publish: "true"
+          maven-snapshot-publish: "true"
