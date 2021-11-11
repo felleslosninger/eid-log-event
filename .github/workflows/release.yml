@@ -44,5 +44,4 @@ jobs:
           access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           git-release-bot-name: "github-action"
           git-release-bot-email: "actions@github.com"
-
           maven-args: "-DskipTests"
