@@ -45,3 +45,4 @@ jobs:
           git-release-bot-name: "github-action"
           git-release-bot-email: "actions@github.com"
           maven-args: "-DskipTests"
+          release-branch-name: "issue-25"
