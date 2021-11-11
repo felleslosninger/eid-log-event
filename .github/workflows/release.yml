@@ -37,7 +37,6 @@ jobs:
         env:
           JAVA_HOME: /usr/lib/jvm/java-1.8-openjdk/
         with:
-          maven-project-folder: "idporten-log-event/"
           maven-repo-server-id: github
           maven-repo-server-username: ${{ secrets.MAVEN_USER }}
           maven-repo-server-password: ${{ secrets.MAVEN_PASSWORD }}
