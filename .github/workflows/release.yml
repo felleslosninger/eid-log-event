@@ -1,4 +1,4 @@
-name: Release to Artifactory
+name: Release to GitHub Packages
 
 on:
   workflow_dispatch:
@@ -30,7 +30,15 @@ jobs:
       - name: Build with Maven
         run: mvn -B package
 
-      - name: Publish to GitHub Packages
+      - name: Configure Git User
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git config remote.origin.url "https://${{EID_BUILD_PAT}}@github.com/felleslosninger/idporten-log-event.git
+        env:
+          EID_BUILD_PAT: ${{ secrets.EID_BUILD_PAT }}
+
+      - name: Maven Release
         run: mvn release:prepare release:perform -X -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
         env:
           GITHUB_ACTOR: ${{ github.actor }}
