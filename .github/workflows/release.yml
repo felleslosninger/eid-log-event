@@ -31,6 +31,8 @@ jobs:
         run: mvn -B -U package
 
       - name: Release
+        env:
+          JAVA_HOME: /usr/lib/jvm/java-1.8-openjdk/
         uses: mg-smartrent/github-actions-maven-release@master
         with:
           release-branch-name: "issue-25"
