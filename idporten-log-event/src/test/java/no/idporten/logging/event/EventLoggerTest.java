@@ -43,7 +43,7 @@ class EventLoggerTest {
 
         MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
         SpecificAvroSerde<EventRecord> serde = new SpecificAvroSerde<>(schemaRegistryClient);
-        serde.configure(config.toMap(), false);
+        serde.configure(config.getProducerConfig(), false);
 
         eventLogger = new EventLogger(config);
         eventLogger.producer.close();
@@ -74,7 +74,7 @@ class EventLoggerTest {
 
     @Test
     void noLoggingWhenDisabled() {
-        EventLoggingConfig disablingconfig = EventLoggingConfig.builder()
+        EventLoggingConfig disablingConfig = EventLoggingConfig.builder()
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
@@ -82,7 +82,7 @@ class EventLoggerTest {
                 .featureEnabled(false)
                 .build();
 
-        eventLogger = new EventLogger(disablingconfig);
+        eventLogger = new EventLogger(disablingConfig);
         eventLogger.log(record);
         eventLogger.producer.flush();
         assertTrue(eventLogger.producer instanceof NoLoggingProducer, "Logger should be non-logging");

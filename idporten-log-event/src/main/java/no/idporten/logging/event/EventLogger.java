@@ -20,7 +20,7 @@ public class EventLogger {
         this.config = eventLoggingConfig;
 
         if (config.isFeatureEnabled()) {
-            this.producer = new KafkaProducer<>(config.toMap());
+            this.producer = new KafkaProducer<>(config.getProducerConfig());
         } else {
             this.producer = new NoLoggingProducer();
             log.info("Event logging disabled through property {}={}", FEATURE_ENABLED_KEY, config.isFeatureEnabled());
