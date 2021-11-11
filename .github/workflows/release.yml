@@ -27,22 +27,22 @@ jobs:
           server-id: github
           settings-path: ${{ github.workspace }}
 
-  - name: Build and Test
-      uses: qcastel/github-actions-maven-cmd@v1
-      with:
-        maven-args: "clean install"
+      - name: Build and Test
+        uses: qcastel/github-actions-maven-cmd@v1
+        with:
+          maven-args: "clean install"
 
-  - name: Release
-      uses: qcastel/github-actions-maven-release@v1
-      env:
-        JAVA_HOME: /usr/lib/jvm/java-1.8-openjdk/
-      with:
-        maven-project-folder: "idporten-log-event/"
-        maven-repo-server-id: github
-        maven-repo-server-username: ${{ secrets.MAVEN_USER }}
-        maven-repo-server-password: ${{ secrets.MAVEN_PASSWORD }}
-        access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-        git-release-bot-name: "github-action"
-        git-release-bot-email: "actions@github.com"
+      - name: Release
+        uses: qcastel/github-actions-maven-release@v1
+        env:
+          JAVA_HOME: /usr/lib/jvm/java-1.8-openjdk/
+        with:
+          maven-project-folder: "idporten-log-event/"
+          maven-repo-server-id: github
+          maven-repo-server-username: ${{ secrets.MAVEN_USER }}
+          maven-repo-server-password: ${{ secrets.MAVEN_PASSWORD }}
+          access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          git-release-bot-name: "github-action"
+          git-release-bot-email: "actions@github.com"
 
-        maven-args: "-DskipTests"
+          maven-args: "-DskipTests"
