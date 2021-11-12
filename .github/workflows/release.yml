@@ -27,6 +27,12 @@ jobs:
       #          server-id: github
       #          settings-path: ${{ github.workspace }}
 
+
+      - name: Configure Git User
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+
       - name: Deploy to Github Package Registry
         env:
           GITHUB_TOKEN: ${{ github.token }}
