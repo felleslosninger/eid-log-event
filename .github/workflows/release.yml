@@ -37,7 +37,7 @@ jobs:
         run: mvn release:prepare -B -X -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
 
       - name: Publish
-        run: mvn release:perform -B -X -Dusername="${GITHUB_ACTOR}" -Dpassword="${env.GITHUB_TOKEN}"
+        run: mvn release:perform -B -X -Dusername="${GITHUB_ACTOR}" -Dpassword="${GITHUB_TOKEN}"
 
 #      - name: Deploy to Github Package Registry
 #        env:
