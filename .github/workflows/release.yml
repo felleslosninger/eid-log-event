@@ -24,7 +24,7 @@ jobs:
           distribution: 'zulu'
           java-version: '8'
           cache: maven
-      #          server-id: github
+          server-id: github
       #          settings-path: ${{ github.workspace }}
 
 
@@ -36,11 +36,14 @@ jobs:
       - name: Prepare release
         run: mvn release:prepare -B -X -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
 
-      - name: Deploy to Github Package Registry
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
-          REPO="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
-          mvn -B deploy -DaltDeploymentRepository="${REPO}"
+      - name: Publish
+        run: mvn release:perform -B -X -Dusername="${GITHUB_ACTOR}" -Dpassword="${env.GITHUB_TOKEN}"
+
+#      - name: Deploy to Github Package Registry
+#        env:
+#          GITHUB_TOKEN: ${{ github.token }}
+#        run: |
+#          mkdir -p ~/.m2
+#          echo "<settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+#          REPO="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
+#          mvn -B deploy -DaltDeploymentRepository="${REPO}"
