@@ -25,8 +25,6 @@ jobs:
           java-version: '8'
           cache: maven
           server-id: github
-      #          settings-path: ${{ github.workspace }}
-
 
       - name: Configure Git User (for Maven Release)
         run: |
@@ -38,12 +36,3 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ github.token }}
         run: mvn release:prepare release:perform -U -B -X -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} -Dusername="${{env.GITHUB_ACTOR}}" -Dpassword="${{env.GITHUB_TOKEN}}"
-
-#      - name: Deploy to Github Package Registry
-#        env:
-#          GITHUB_TOKEN: ${{ github.token }}
-#        run: |
-#          mkdir -p ~/.m2
-#          echo "<settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
-#          REPO="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
-#          mvn -B deploy -DaltDeploymentRepository="${REPO}"
