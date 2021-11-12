@@ -6,7 +6,7 @@
     <artifactId>idporten-log-event-parent</artifactId>
     <groupId>no.idporten.logging</groupId>
     <packaging>pom</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <modules>
         <module>idporten-log-event</module>
@@ -158,7 +158,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/felleslosninger/${project.artifactId}</url>
+            <url>https://maven.pkg.github.com/felleslosninger/idporten-log-event/${project.artifactId}</url>
         </repository>
     </distributionManagement>
 
