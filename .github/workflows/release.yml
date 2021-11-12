@@ -28,10 +28,13 @@ jobs:
       #          settings-path: ${{ github.workspace }}
 
 
-      - name: Configure Git User
+      - name: Configure Git User (for Maven Release)
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+
+      - name: Prepare release
+        run: mvn release:prepare -B -X -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
 
       - name: Deploy to Github Package Registry
         env:
@@ -40,6 +43,4 @@ jobs:
           mkdir -p ~/.m2
           echo "<settings><servers><server><id>github</id><username>${GITHUB_ACTOR}</username><password>\${env.GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
           REPO="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
-          mvn release:prepare -B -X -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
           mvn -B deploy -DaltDeploymentRepository="${REPO}"
-        #          mvn versions:set -B -DnewVersion="${{ github.event.inputs.releaseVersion }}"
