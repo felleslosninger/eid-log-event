@@ -8,7 +8,7 @@
     <artifactId>idporten-log-event-parent</artifactId>
     <groupId>no.idporten.logging</groupId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <modules>
         <module>idporten-log-event</module>
@@ -16,7 +16,8 @@
     </modules>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/felleslosninger/idporten-log-event.git/</developerConnection>
+        <connection>scm:git:https://github.com/felleslosninger/idporten-log-event.git</connection>
+        <developerConnection>scm:git:https://github.com/felleslosninger/idporten-log-event.git</developerConnection>
         <url>https://github.com/felleslosninger/idporten-log-event</url>
         <tag>HEAD</tag>
     </scm>
@@ -128,33 +129,15 @@
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jfrog.buildinfo</groupId>
-                <artifactId>artifactory-maven-plugin</artifactId>
-                <version>${artifactory-maven-plugin.version}</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>build-info</id>
-                        <goals>
-                            <goal>publish</goal>
-                        </goals>
-                        <configuration>
-                            <publisher>
-                                <contextUrl>https://your-artifactory.jfrog.io/artifactory</contextUrl>
-                                <username>stream-github-actions</username>
-                                <password>${env.ARTIFACTORY_TOKEN}</password>
-                                <repoKey>libs-release-local</repoKey>
-                                <snapshotRepoKey>libs-snapshot-local</snapshotRepoKey>
-                            </publisher>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
     <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub felleslosninger Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/felleslosninger/idporten-log-event</url>
+        </repository>
         <repository>
             <id>digdir-artifactory</id>
             <name>libs-release</name>
@@ -171,4 +154,14 @@
             <url>https://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
+
+    <!-- Repository we deploy to -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/felleslosninger/idporten-log-event</url>
+        </repository>
+    </distributionManagement>
+
 </project>
