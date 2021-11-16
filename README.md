@@ -72,8 +72,11 @@ digdir:
     logging:
       bootstrap-servers: example.com:80
       schema-registry-url: example.com:80
-      kafka-username: kafka
-```
+      kafka-username: kafkaUsername
+      kafka-password: kafkaPassword
+      schema-registry-password: schemaPassword
+      schema-registry-username: schemaUsername
+      event-topic: eventTopic
 ### Usage
 Simply wire in the Spring Boot-configured `EventLogger`:
 ```java
@@ -91,3 +94,11 @@ Simply wire in the Spring Boot-configured `EventLogger`:
 
             eventLogger.log(record);
 ```
+## Feature toggling
+Publishing to Kafka can be disabled by setting the `digdir.event.logging.feature-enabled` property to `false`.
+
+### In idporten-log-event
+When only the core library is used, the property is set in `event-logger.properties`.
+
+### In idporten-log-event-spring-boot-starter
+When using the Spring Boot Starter, the property is set in `application.yml`. 
