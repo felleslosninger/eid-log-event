@@ -99,6 +99,29 @@ class EventLoggingConfigTest {
     }
 
     @Test
+    void threadPoolSize() {
+        EventLoggingConfig config = EventLoggingConfig.builder()
+                .bootstrapServers("abc")
+                .schemaRegistryUrl("abc")
+                .kafkaUsername("abc")
+                .featureEnabled(true)
+                .threadPoolSize(20)
+                .build();
+        assertEquals(20, config.getThreadPoolSize(), "ThreadPoolSize should be equal to builder input");
+    }
+
+    @Test
+    void threadPoolSizeDefault() {
+        EventLoggingConfig config = EventLoggingConfig.builder()
+                .bootstrapServers("abc")
+                .schemaRegistryUrl("abc")
+                .kafkaUsername("abc")
+                .featureEnabled(true)
+                .build();
+        assertEquals(4, config.getThreadPoolSize(), "ThreadPoolSize default should be 4");
+    }
+
+    @Test
     void noSchemaRegistryUsername() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
                 .bootstrapServers("abc")

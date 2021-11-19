@@ -87,4 +87,21 @@ class EventLoggerTest {
         eventLogger.producer.flush();
         assertTrue(eventLogger.producer instanceof NoLoggingProducer, "Logger should be non-logging");
     }
+
+    @Test
+    void threadPoolSize() {
+        assertEquals(4, eventLogger.pool.getCorePoolSize(), "Default poolSize should be 4");
+        EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
+                .bootstrapServers(DUMMY_URL)
+                .schemaRegistryUrl(DUMMY_URL)
+                .kafkaUsername(USERNAME)
+                .eventTopic("any topic")
+                .featureEnabled(true)
+                .threadPoolSize(20)
+                .build();
+
+        eventLogger = new EventLogger(customPoolSizeConfig);
+        assertEquals(20, eventLogger.pool.getCorePoolSize(), "poolSize should be equal to the new custom set size");
+
+    }
 }
