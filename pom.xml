@@ -33,6 +33,9 @@
         <artifactory.url>http://eid-artifactory.dmz.local:8080/artifactory</artifactory.url>
         <kafka.version>7.0.0-ce</kafka.version>
         <confluent.version>7.0.0</confluent.version>
+        <kafka.scala.version>2.13</kafka.scala.version>
+        <curator.version>2.9.0</curator.version>
+        <jackson.version>2.12.5</jackson.version>
         <lombok.version>1.18.22</lombok.version>
         <avro.version>1.11.0</avro.version>
         <junit.version>5.8.1</junit.version>
@@ -90,6 +93,38 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-streams-avro-serde</artifactId>
                 <version>${confluent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${kafka.scala.version}</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${kafka.scala.version}</artifactId>
+                <version>${kafka.version}</version>
+                <classifier>test</classifier>
+            </dependency>
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-schema-registry</artifactId>
+                <version>${confluent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-schema-registry</artifactId>
+                <version>${confluent.version}</version>
+                <classifier>tests</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
