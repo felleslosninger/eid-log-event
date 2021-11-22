@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -86,5 +88,34 @@ class EventLoggerTest {
         eventLogger.log(record);
         eventLogger.producer.flush();
         assertTrue(eventLogger.producer instanceof NoLoggingProducer, "Logger should be non-logging");
+    }
+
+    @Test
+    void threadPoolSize() {
+        assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");
+        EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
+                .bootstrapServers(DUMMY_URL)
+                .schemaRegistryUrl(DUMMY_URL)
+                .kafkaUsername(USERNAME)
+                .eventTopic("any topic")
+                .featureEnabled(true)
+                .threadPoolSize(20)
+                .build();
+
+        eventLogger = new EventLogger(customPoolSizeConfig);
+        assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
+        assertEquals(20, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "poolSize should be equal to the new custom set size");
+    }
+
+    @Test
+    void queueStats() {
+        assertTrue(eventLogger.getPoolQueueStats().contains("ThreadPoolSize:"),
+                "\"ThreadPoolSize:\" is the first part of the queueStats when the stats are displayed as they should.");
+    }
+
+    @Test
+    void metrics() {
+        assertNotNull(eventLogger.getMetrics(), "The eventLoggers metrics should be reachable and available.");
     }
 }

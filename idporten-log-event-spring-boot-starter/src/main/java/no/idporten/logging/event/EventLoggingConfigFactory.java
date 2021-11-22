@@ -23,6 +23,7 @@ class EventLoggingConfigFactory {
                 .schemaRegistryUrl(eventLoggingConfigurationProperties.getSchemaRegistryUrl())
                 .schemaRegistryPassword(eventLoggingConfigurationProperties.getSchemaRegistryPassword())
                 .schemaRegistryUsername(eventLoggingConfigurationProperties.getSchemaRegistryUsername())
+                .threadPoolSize(eventLoggingConfigurationProperties.getThreadPoolSize())
                 .build();
     }
 

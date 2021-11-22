@@ -30,6 +30,7 @@ import no.idporten.logging.event.EventLoggingConfig;
                 .schemaRegistryUrl(REGISTRY_HOST_AND_PORT)
                 .kafkaUsername(USERNAME)
                 .kafkaPassword(PASSWORD)
+                .threadPoolSize(8) //Defaults to 4 if not set
                 .build();
 
         EventLogger eventLogger = new EventLogger(config);
@@ -77,6 +78,8 @@ digdir:
       schema-registry-password: schemaPassword
       schema-registry-username: schemaUsername
       event-topic: eventTopic
+      thread-pool-size: 2 #Defaults to 4 if not set
+
 ### Usage
 Simply wire in the Spring Boot-configured `EventLogger`:
 ```java

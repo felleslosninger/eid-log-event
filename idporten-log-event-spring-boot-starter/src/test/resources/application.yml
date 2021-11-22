@@ -8,6 +8,7 @@ digdir:
       schema-registry-password: schemaPassword
       schema-registry-username: schemaUsername
       event-topic: springEventTopic
+      thread-pool-size: 10
 
 spring:
   main:

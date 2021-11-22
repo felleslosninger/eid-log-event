@@ -25,6 +25,8 @@ public class EventLoggingConfig {
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String EVENT_TOPIC_KEY = "event.topic";
+    static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
+
     private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
     private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
@@ -69,6 +71,10 @@ public class EventLoggingConfig {
      * Kafka topic to publish to
      */
     private final String eventTopic;
+    /**
+     * Number of working threads in the eventLoggerThreadPool.
+     */
+    private final int threadPoolSize;
     private final Map<String, Object> producerConfig;
 
     @Builder
@@ -80,7 +86,8 @@ public class EventLoggingConfig {
             String kafkaPassword,
             String schemaRegistryUsername,
             String schemaRegistryPassword,
-            String eventTopic) {
+            String eventTopic,
+            Integer threadPoolSize) {
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistryUrl;
         this.kafkaUsername = kafkaUsername;
@@ -94,6 +101,16 @@ public class EventLoggingConfig {
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(
                 Boolean.valueOf(eventLoggerDefaultProperties.getProperty(FEATURE_ENABLED_KEY, "true"))
         );
+        this.threadPoolSize = Optional.ofNullable(threadPoolSize).orElse(
+                Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_SIZE_KEY))
+        );
+    }
+
+    private static Map<String, ?> propertiesToMap(Properties properties) {
+        return properties.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> String.valueOf(entry.getKey()),
+                        entry -> String.valueOf(entry.getValue())));
     }
 
     private String determineEventTopic(String userSpecifiedEventTopic, Properties defaultProperties) {
@@ -102,13 +119,6 @@ public class EventLoggingConfig {
         } else {
             return userSpecifiedEventTopic;
         }
-    }
-
-    private static Map<String, ?> propertiesToMap(Properties properties) {
-        return properties.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> String.valueOf(entry.getKey()),
-                        entry -> String.valueOf(entry.getValue())));
     }
 
     private Map<String, Object> createProducerConfig() {
@@ -158,5 +168,9 @@ public class EventLoggingConfig {
 
     public boolean isFeatureEnabled() {
         return featureEnabled;
+    }
+
+    public int getThreadPoolSize() {
+        return threadPoolSize;
     }
 }
