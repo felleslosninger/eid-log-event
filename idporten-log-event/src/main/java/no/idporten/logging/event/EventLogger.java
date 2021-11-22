@@ -33,7 +33,7 @@ public class EventLogger {
         }
 
         pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), new ThreadFactory() {
-            int threadNumber = 0;
+            private int threadNumber = 0;
 
             @Override
             public Thread newThread(Runnable r) {
