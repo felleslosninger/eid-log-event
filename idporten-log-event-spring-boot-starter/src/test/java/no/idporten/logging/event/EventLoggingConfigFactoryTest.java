@@ -66,6 +66,12 @@ class EventLoggingConfigFactoryTest {
     }
 
     @Test
+    void threadPoolSizeCanBeSetFromYaml() {
+        assertEquals(10, eventLoggingConfig.getThreadPoolSize(), "application.yml in test/resources are overriding the default eventTopic with springEventTopic");
+    }
+
+
+    @Test
     void featureEnabledByDefault() {
         assertTrue(eventLoggingConfig.isFeatureEnabled(), "application.yml in main/resources are defining feature enabled to true as the default starting point");
     }

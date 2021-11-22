@@ -19,6 +19,7 @@ class EventLoggingConfigurationProperties {
     private final String schemaRegistryUsername;
     private final String schemaRegistryPassword;
     private final String eventTopic;
+    private final Integer threadPoolSize;
 
     EventLoggingConfigurationProperties(
             Boolean featureEnabled,
@@ -28,7 +29,8 @@ class EventLoggingConfigurationProperties {
             String kafkaPassword,
             String schemaRegistryUsername,
             String schemaRegistryPassword,
-            String eventTopic) {
+            String eventTopic,
+            Integer threadPoolSize) {
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistryUrl;
@@ -37,5 +39,6 @@ class EventLoggingConfigurationProperties {
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
         this.eventTopic = eventTopic;
+        this.threadPoolSize = threadPoolSize;
     }
 }

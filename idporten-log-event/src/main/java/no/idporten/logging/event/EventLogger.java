@@ -8,15 +8,16 @@ import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static no.idporten.logging.event.EventLoggingConfig.FEATURE_ENABLED_KEY;
 
 @Slf4j
 public class EventLogger {
-    final ThreadPoolExecutor pool;
+    final ExecutorService pool;
 
     private final EventLoggingConfig config;
     Producer<String, EventRecord> producer;
@@ -31,13 +32,14 @@ public class EventLogger {
             log.info("Event logging disabled through property {}={}", FEATURE_ENABLED_KEY, config.isFeatureEnabled());
         }
 
-        pool = new ThreadPoolExecutor(
-                config.getThreadPoolSize(),
-                config.getThreadPoolSize(),
-                0L,
-                TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>()
-        );
+        pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), new ThreadFactory() {
+            int threadNumber = 0;
+
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "eventLogPool-" + threadNumber++);
+            }
+        });
     }
 
     public void log(EventRecord eventRecord) {
@@ -77,10 +79,15 @@ public class EventLogger {
     }
 
     public String getPoolQueueStats() {
-        return String.format(
-                "ThreadPoolSize: %d, activeCount: %d, queueSize: %d",
-                pool.getPoolSize(),
-                pool.getActiveCount(),
-                pool.getQueue().size());
+        if (pool instanceof ThreadPoolExecutor) {
+            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) pool;
+            return String.format(
+                    "ThreadPoolSize: %d, activeCount: %d, queueSize: %d",
+                    threadPoolExecutor.getPoolSize(),
+                    threadPoolExecutor.getActiveCount(),
+                    threadPoolExecutor.getQueue().size());
+        } else {
+            return "Cannot get ThreadPool queueStats as ExecutorService is not of type ThreadPoolExecutor. It was type: " + pool.getClass();
+        }
     }
 }

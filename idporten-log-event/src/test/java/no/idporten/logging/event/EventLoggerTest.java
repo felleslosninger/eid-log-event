@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -90,7 +92,8 @@ class EventLoggerTest {
 
     @Test
     void threadPoolSize() {
-        assertEquals(4, eventLogger.pool.getCorePoolSize(), "Default poolSize should be 4");
+        assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
@@ -101,7 +104,18 @@ class EventLoggerTest {
                 .build();
 
         eventLogger = new EventLogger(customPoolSizeConfig);
-        assertEquals(20, eventLogger.pool.getCorePoolSize(), "poolSize should be equal to the new custom set size");
+        assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
+        assertEquals(20, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "poolSize should be equal to the new custom set size");
+    }
 
+    @Test
+    void queueStats() {
+        assertTrue(eventLogger.getPoolQueueStats().contains("ThreadPoolSize:"),
+                "\"ThreadPoolSize:\" is the first part of the queueStats when the stats are displayed as they should.");
+    }
+
+    @Test
+    void metrics() {
+        assertNotNull(eventLogger.getMetrics(), "The eventLoggers metrics should be reachable and available.");
     }
 }
