@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import scala.Option;
 import scala.jdk.CollectionConverters;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -79,7 +78,7 @@ public class EmbeddedSingleNodeKafkaCluster {
     /**
      * Creates and starts the cluster.
      */
-    public void start(File logDir) throws Exception {
+    public void start() throws Exception {
         log.debug("Initiating embedded Kafka cluster startup");
         log.debug("Starting a ZooKeeper instance...");
         zookeeper = new ZooKeeperEmbedded();
@@ -88,7 +87,7 @@ public class EmbeddedSingleNodeKafkaCluster {
         final Properties effectiveBrokerConfig = effectiveBrokerConfigFrom(brokerConfig, zookeeper);
         log.debug("Starting a Kafka instance on port {} ...",
                 effectiveBrokerConfig.getProperty(KafkaConfig.ListenersProp()));
-        broker = new KafkaEmbedded(effectiveBrokerConfig, logDir);
+        broker = new KafkaEmbedded(effectiveBrokerConfig);
         log.debug("Kafka instance is running at {}, connected to ZooKeeper at {}",
                 broker.brokerList(), broker.zookeeperConnect());
 

@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -58,14 +60,12 @@ public class KafkaEmbedded {
     /**
      * Creates and starts an embedded Kafka broker.
      *
-     * @param config  Broker configuration settings.  Used to modify, for example, on which port the
-     *                broker should listen to.  Note that you cannot change some settings such as
-     *                `log.dirs`, `port`.
-     * @param tempDir Temporary directory.
+     * @param config Broker configuration settings.  Used to modify, for example, on which port the
+     *               broker should listen to.  Note that you cannot change some settings such as
+     *               `log.dirs`, `port`.
      */
-    public KafkaEmbedded(final Properties config, File tempDir) {
-        logDir = new File(tempDir, "log");
-        logDir.mkdir();
+    public KafkaEmbedded(final Properties config) throws IOException {
+        logDir = Files.createTempDirectory("log").toFile();
         effectiveConfig = effectiveConfigFrom(config);
         final boolean loggingEnabled = true;
 
@@ -121,6 +121,7 @@ public class KafkaEmbedded {
                 brokerList(), zookeeperConnect());
         kafka.shutdown();
         kafka.awaitShutdown();
+        logDir.delete();
         log.debug("Shutdown of embedded Kafka broker at {} completed (with ZK ensemble at {}) ...",
                 brokerList(), zookeeperConnect());
     }
