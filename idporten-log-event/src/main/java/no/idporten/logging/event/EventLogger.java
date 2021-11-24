@@ -8,6 +8,7 @@ import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -48,7 +49,7 @@ public class EventLogger {
                         config.getEventTopic(),
                         null, // no specific partition
                         System.currentTimeMillis(), // instead of time it was sent
-                        eventRecord.getPid().toString(),
+                        UUID.randomUUID().toString(),
                         eventRecord);
 
         Runnable task = () -> {
