@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +61,7 @@ class EventLoggerTest {
         Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        assertEquals(FNR, mockProducer.history().get(0).key(), "Record key should be the PID");
+        assertNotEquals(FNR, mockProducer.history().get(0).key(), "Record key should not be the PID");
     }
 
     @SuppressWarnings("unchecked")
