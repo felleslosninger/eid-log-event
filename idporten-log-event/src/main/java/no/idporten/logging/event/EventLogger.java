@@ -44,7 +44,12 @@ public class EventLogger {
 
     public void log(EventRecord eventRecord) {
         ProducerRecord<String, EventRecord> producerRecord =
-                new ProducerRecord<>(config.getEventTopic(), eventRecord.getPid().toString(), eventRecord);
+                new ProducerRecord<>(
+                        config.getEventTopic(),
+                        null, // no specific partition
+                        System.currentTimeMillis(), // instead of time it was sent
+                        eventRecord.getPid().toString(),
+                        eventRecord);
 
         Runnable task = () -> {
             try {
