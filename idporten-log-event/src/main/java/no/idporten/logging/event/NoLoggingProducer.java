@@ -29,6 +29,7 @@ class NoLoggingProducer implements org.apache.kafka.clients.producer.Producer<St
     }
 
     @Override
+    @Deprecated
     public void sendOffsetsToTransaction(
             Map<TopicPartition, OffsetAndMetadata> map, String s) throws ProducerFencedException {
     }
