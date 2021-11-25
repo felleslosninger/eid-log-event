@@ -10,14 +10,14 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.nio.file.Path;
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,7 +31,7 @@ public class EventLoggingIT {
 
     public static final EmbeddedSingleNodeKafkaCluster cluster = new EmbeddedSingleNodeKafkaCluster();
     public static final String TOPIC = "aktiviteter";
-    public static final long TEN_SECONDS = 30000L;
+    public static final long TEN_SECONDS = 10000L;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -44,8 +44,18 @@ public class EventLoggingIT {
         cluster.stop();
     }
 
+    private static EventLoggingConfig removeSecurityProperty(EventLoggingConfig config) throws NoSuchFieldException, IllegalAccessException {
+        Map<String, Object> configWithoutSecurity = config.getProducerConfig().entrySet().stream()
+                .filter(e -> !e.getKey().equals("security.protocol"))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Field producerConfig = config.getClass().getDeclaredField("producerConfig");
+        producerConfig.setAccessible(true);
+        producerConfig.set(config, configWithoutSecurity);
+        return config;
+    }
+
     @Test
-    void shouldLog() {
+    void shouldLog() throws Exception {
         final List<EventRecord> inputValues = Arrays.asList(
                 EventRecord.newBuilder()
                         .setName("Innlogget")
@@ -74,7 +84,7 @@ public class EventLoggingIT {
                 .eventTopic(TOPIC)
                 .build();
 
-        EventLogger eventLogger = new EventLogger(config);
+        EventLogger eventLogger = new EventLogger(removeSecurityProperty(config));
 
         final Properties consumerProperties = new Properties();
         consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.bootstrapServers());
@@ -101,7 +111,7 @@ public class EventLoggingIT {
             records.forEach(record -> received.add(record.key()));
         }
 
-        assertTrue(expected.containsAll(received));
+        assertTrue(received.containsAll(expected) & expected.containsAll(received));
     }
 
 

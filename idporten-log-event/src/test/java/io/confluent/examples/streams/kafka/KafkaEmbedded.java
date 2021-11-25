@@ -121,7 +121,8 @@ public class KafkaEmbedded {
                 brokerList(), zookeeperConnect());
         kafka.shutdown();
         kafka.awaitShutdown();
-        logDir.delete();
+        boolean deleted = logDir.delete();
+        log.debug("Temporary files deleted: {}", deleted);
         log.debug("Shutdown of embedded Kafka broker at {} completed (with ZK ensemble at {}) ...",
                 brokerList(), zookeeperConnect());
     }

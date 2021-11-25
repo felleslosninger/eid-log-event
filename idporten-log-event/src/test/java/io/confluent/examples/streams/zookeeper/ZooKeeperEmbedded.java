@@ -36,7 +36,7 @@ public class ZooKeeperEmbedded {
     /**
      * Creates and starts a ZooKeeper instance.
      *
-     * @throws Exception
+     * @throws Exception thrown
      */
     public ZooKeeperEmbedded() throws Exception {
         log.debug("Starting embedded ZooKeeper server...");
