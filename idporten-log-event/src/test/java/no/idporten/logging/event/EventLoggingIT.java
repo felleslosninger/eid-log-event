@@ -31,7 +31,7 @@ class EventLoggingIT {
 
     private static final EmbeddedSingleNodeKafkaCluster cluster = new EmbeddedSingleNodeKafkaCluster();
     private static final String TOPIC = "aktiviteter";
-    public static final long TEN_SECONDS = 10000L;
+    private static final long TEN_SECONDS = 10000L;
 
     @BeforeAll
     static void beforeAll() throws Exception {
