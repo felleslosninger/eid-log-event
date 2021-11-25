@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class EventLoggingIT {
 
     private static final EmbeddedSingleNodeKafkaCluster cluster = new EmbeddedSingleNodeKafkaCluster();
-    public static final String TOPIC = "aktiviteter";
+    private static final String TOPIC = "aktiviteter";
     public static final long TEN_SECONDS = 10000L;
 
     @BeforeAll
