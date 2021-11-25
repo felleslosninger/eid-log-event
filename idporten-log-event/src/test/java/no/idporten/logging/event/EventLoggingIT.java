@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Integration test using the embedded Kafka cluster by Confluent
  */
-public class EventLoggingIT {
+class EventLoggingIT {
 
     public static final EmbeddedSingleNodeKafkaCluster cluster = new EmbeddedSingleNodeKafkaCluster();
     public static final String TOPIC = "aktiviteter";
