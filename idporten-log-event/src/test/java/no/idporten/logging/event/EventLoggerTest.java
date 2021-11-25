@@ -91,6 +91,18 @@ class EventLoggerTest {
     }
 
     @Test
+    void noConfigWhenDisabled() {
+        EventLoggingConfig disablingConfig = EventLoggingConfig.builder()
+                .featureEnabled(false)
+                .build();
+
+        eventLogger = new EventLogger(disablingConfig);
+        eventLogger.log(record);
+        eventLogger.producer.flush();
+        assertTrue(eventLogger.producer instanceof NoLoggingProducer, "Logger should be non-logging");
+    }
+
+    @Test
     void threadPoolSize() {
         assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");

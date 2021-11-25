@@ -3,7 +3,6 @@ package no.idporten.logging.event;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -31,6 +30,7 @@ public class EventLoggingConfig {
     private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
             "required username=\"%s\" password=\"%s\";";
+    private static final String NULL_TEMPLATE = "%s must not be null. Please check the configuration.";
     /**
      * Feature toggle
      */
@@ -80,30 +80,44 @@ public class EventLoggingConfig {
     @Builder
     public EventLoggingConfig(
             Boolean featureEnabled,
-            @NonNull String bootstrapServers,
-            @NonNull String schemaRegistryUrl,
-            @NonNull String kafkaUsername,
+            String bootstrapServers,
+            String schemaRegistryUrl,
+            String kafkaUsername,
             String kafkaPassword,
             String schemaRegistryUsername,
             String schemaRegistryPassword,
             String eventTopic,
             Integer threadPoolSize) {
-        this.bootstrapServers = bootstrapServers;
-        this.schemaRegistryUrl = schemaRegistryUrl;
-        this.kafkaUsername = kafkaUsername;
         this.kafkaPassword = kafkaPassword;
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
-        this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
 
         Properties eventLoggerDefaultProperties = loadPropertiesFromFile(EVENT_LOGGER_PROPERTIES_FILE_PATH);
-        this.eventTopic = determineEventTopic(eventTopic, eventLoggerDefaultProperties);
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(
                 Boolean.valueOf(eventLoggerDefaultProperties.getProperty(FEATURE_ENABLED_KEY, "true"))
         );
         this.threadPoolSize = Optional.ofNullable(threadPoolSize).orElse(
-                Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_SIZE_KEY))
-        );
+                Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_SIZE_KEY)));
+
+        if (this.featureEnabled) {
+            this.bootstrapServers = Objects.requireNonNull(bootstrapServers, String.format(
+                    NULL_TEMPLATE,
+                    ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
+            this.schemaRegistryUrl = Objects.requireNonNull(schemaRegistryUrl, String.format(
+                    NULL_TEMPLATE,
+                    KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG));
+            this.kafkaUsername = Objects.requireNonNull(kafkaUsername, String.format(
+                    NULL_TEMPLATE,
+                    KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
+            this.eventTopic = determineEventTopic(eventTopic, eventLoggerDefaultProperties);
+            this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
+        } else {
+            this.bootstrapServers = null;
+            this.schemaRegistryUrl = null;
+            this.kafkaUsername = null;
+            this.eventTopic = "";
+            this.producerConfig = null;
+        }
     }
 
     private static Map<String, ?> propertiesToMap(Properties properties) {
