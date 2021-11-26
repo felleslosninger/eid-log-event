@@ -10,6 +10,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -100,6 +101,16 @@ class EventLoggerTest {
         eventLogger.log(record);
         eventLogger.producer.flush();
         assertTrue(eventLogger.producer instanceof NoLoggingProducer, "Logger should be non-logging");
+    }
+
+    @Test
+    void defaultCreationTimestamp() {
+        Instant now = Instant.now();
+        assertEquals(null, record.getCreated(), "Unexpected initialization of record creation time");
+
+        eventLogger.log(record);
+        assertTrue(now.isBefore(record.getCreated()) && now.plusMillis(100).isAfter(record.getCreated()),
+                "Creation timestamp not close enough to current time");
     }
 
     @Test
