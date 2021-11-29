@@ -40,7 +40,7 @@ class EventLoggingConfigFactoryTest {
     @Test
     void schemaRegistryUrlCanBeSetFromYaml() {
         assertEquals("localhost:443", eventLoggingConfig.getProducerConfig()
-                .get(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG));
+                .get(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG), "localhost:443 was expected as the schemaRegistryUrl but was not found.");
     }
 
     @Test
@@ -57,7 +57,7 @@ class EventLoggingConfigFactoryTest {
     @Test
     void bootstrapServersCanBeSetFromYaml() {
         assertEquals("localhost:443", eventLoggingConfig.getProducerConfig()
-                .get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
+                .get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG), "localhost:443 was expected as the bootstrapServers but was not found.");
     }
 
     @Test

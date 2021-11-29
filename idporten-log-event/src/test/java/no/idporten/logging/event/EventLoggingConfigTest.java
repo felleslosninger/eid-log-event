@@ -18,9 +18,9 @@ class EventLoggingConfigTest {
     @Test
     void eventTopicIsSet() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
+                .bootstrapServers("bootstrapServers")
+                .kafkaUsername("kafkaUsername")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .eventTopic("myFantasticTopic")
                 .build();
 
@@ -32,9 +32,9 @@ class EventLoggingConfigTest {
     @Test
     void eventTopicDefault() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
+                .bootstrapServers("bootstrapServers")
+                .kafkaUsername("kafkaUsername")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .build();
 
         assertEquals("aktiviteter", eventLoggingConfig.getEventTopic(), "The eventTopic default value aktiviteter should be there when its not provided in the builder");
@@ -45,33 +45,33 @@ class EventLoggingConfigTest {
     @Test
     void bootstrapServersIsRequired() {
         assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
+                .kafkaUsername("kafkaUsername")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .build(), "BootStrapServers is a required field");
     }
 
     @Test
     void schemaRegistryUrlIsRequired() {
         assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
-                .kafkaUsername("abc")
-                .bootstrapServers("abc")
+                .kafkaUsername("kafkaUsername")
+                .bootstrapServers("bootstrapServers")
                 .build(), "schemaRegistryUrl is a required field");
     }
 
     @Test
     void kafkaUsernameIsRequired() {
         assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
+                .bootstrapServers("bootstrapServers")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .build(), "kafkaUsername is a required field");
     }
 
     @Test
     void testFeatureEnabledDefault() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .kafkaUsername("abc")
+                .bootstrapServers("bootstrapServers")
+                .schemaRegistryUrl("schemaRegistryUrl")
+                .kafkaUsername("kafkaUsername")
                 .build();
         assertTrue(config.isFeatureEnabled(), "Feature should be enabled by default");
     }
@@ -79,9 +79,9 @@ class EventLoggingConfigTest {
     @Test
     void testFeatureEnabled() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .kafkaUsername("abc")
+                .bootstrapServers("bootstrapServers")
+                .schemaRegistryUrl("schemaRegistryUrl")
+                .kafkaUsername("kafkaUsername")
                 .featureEnabled(true)
                 .build();
         assertTrue(config.isFeatureEnabled(), "Feature should be enabled if specifically set");
@@ -90,9 +90,9 @@ class EventLoggingConfigTest {
     @Test
     void testFeatureDisabled() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .kafkaUsername("abc")
+                .bootstrapServers("bootstrapServers")
+                .schemaRegistryUrl("schemaRegistryUrl")
+                .kafkaUsername("kafkaUsername")
                 .featureEnabled(false)
                 .build();
         assertFalse(config.isFeatureEnabled(), "Feature should be disabled if specifically set");
@@ -101,9 +101,9 @@ class EventLoggingConfigTest {
     @Test
     void threadPoolSize() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .kafkaUsername("abc")
+                .bootstrapServers("bootstrapServers")
+                .schemaRegistryUrl("schemaRegistryUrl")
+                .kafkaUsername("kafkaUsername")
                 .featureEnabled(true)
                 .threadPoolSize(20)
                 .build();
@@ -113,9 +113,9 @@ class EventLoggingConfigTest {
     @Test
     void threadPoolSizeDefault() {
         EventLoggingConfig config = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .kafkaUsername("abc")
+                .bootstrapServers("bootstrapServers")
+                .schemaRegistryUrl("schemaRegistryUrl")
+                .kafkaUsername("kafkaUsername")
                 .featureEnabled(true)
                 .build();
         assertEquals(4, config.getThreadPoolSize(), "ThreadPoolSize default should be 4");
@@ -124,9 +124,9 @@ class EventLoggingConfigTest {
     @Test
     void noSchemaRegistryUsername() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
+                .bootstrapServers("bootstrapServers")
+                .kafkaUsername("kafkaUsername")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .build();
 
         assertEquals(
@@ -138,9 +138,9 @@ class EventLoggingConfigTest {
     @Test
     void withSchemaRegistryUsernameAndPassword() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
+                .bootstrapServers("bootstrapServers")
+                .kafkaUsername("kafkaUsername")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .schemaRegistryUsername("username")
                 .schemaRegistryPassword("password")
                 .build();
@@ -157,9 +157,9 @@ class EventLoggingConfigTest {
     @Test
     void withSchemaRegistryUsernameAndNoPassword() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
+                .bootstrapServers("bootstrapServers")
+                .kafkaUsername("kafkaUsername")
+                .schemaRegistryUrl("schemaRegistryUrl")
                 .schemaRegistryUsername("username")
                 .build();
 

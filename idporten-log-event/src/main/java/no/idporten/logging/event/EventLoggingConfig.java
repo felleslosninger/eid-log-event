@@ -24,7 +24,7 @@ public class EventLoggingConfig {
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String EVENT_TOPIC_KEY = "event.topic";
-    static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
+    private static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
 
     private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
     private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
@@ -163,8 +163,11 @@ public class EventLoggingConfig {
     private Properties loadPropertiesFromFile(String propertiesFilePath) {
         Properties properties = new Properties();
 
-        try {
-            InputStream propertiesStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
+        try (
+                InputStream propertiesStream = Thread.currentThread()
+                        .getContextClassLoader()
+                        .getResourceAsStream(propertiesFilePath)
+        ) {
             properties.load(propertiesStream);
         } catch (Exception e) {
             log.warn("Failed to load properties from {}", propertiesFilePath, e);

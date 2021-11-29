@@ -1,5 +1,6 @@
 package no.idporten.logging.event;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -36,8 +37,8 @@ public class EventLogger {
             private int threadNumber = 0;
 
             @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, "eventLogPool-" + threadNumber++);
+            public Thread newThread(@NonNull Runnable runnable) {
+                return new Thread(runnable, "eventLogPool-" + threadNumber++);
             }
         });
     }
@@ -69,7 +70,7 @@ public class EventLogger {
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
         if (producer != null) {
             try {
                 producer.close();
@@ -77,12 +78,15 @@ public class EventLogger {
                 log.warn("Failed to close Kafka producer", e);
             }
         }
+        super.finalize();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Map<MetricName, ? extends Metric> getMetrics() {
         return producer.metrics();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public String getPoolQueueStats() {
         if (pool instanceof ThreadPoolExecutor) {
             ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) pool;

@@ -44,34 +44,38 @@ class EventLoggerTest {
                 .build();
 
         MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
-        SpecificAvroSerde<EventRecord> serde = new SpecificAvroSerde<>(schemaRegistryClient);
-        serde.configure(config.getProducerConfig(), false);
+        try (SpecificAvroSerde<EventRecord> serde = new SpecificAvroSerde<>(schemaRegistryClient)) {
+            serde.configure(config.getProducerConfig(), false);
 
-        eventLogger = new EventLogger(config);
-        eventLogger.producer.close();
-        eventLogger.producer = new MockProducer<>(true, new StringSerializer(), serde.serializer());
+            eventLogger = new EventLogger(config);
+            eventLogger.producer.close();
+            eventLogger.producer = new MockProducer<>(true, new StringSerializer(), serde.serializer());
+        }
     }
 
     @Test
     void log() throws ExecutionException, InterruptedException {
         eventLogger.log(record);
         eventLogger.producer.flush();
-        MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
-        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
 
-        assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        assertEquals(FNR, mockProducer.history().get(0).key(), "Record key should be the PID");
+        try (MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer) {
+            Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+
+            assertEquals(1, sentEventsFuture.get(), "Record should be published");
+            assertEquals(FNR, mockProducer.history().get(0).key(), "Record key should be the PID");
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Test
     void logWhenFailure() {
-        Producer<String, EventRecord> producerMock = mock(Producer.class);
-        when(producerMock.send(any(ProducerRecord.class)))
-                .thenThrow(new KafkaException("Simulating Kafka down"));
-        eventLogger.producer = producerMock;
+        try (Producer<String, EventRecord> producerMock = mock(Producer.class)) {
+            when(producerMock.send(any(ProducerRecord.class)))
+                    .thenThrow(new KafkaException("Simulating Kafka down"));
+            eventLogger.producer = producerMock;
 
-        eventLogger.log(record);
+            eventLogger.log(record);
+        }
     }
 
     @Test

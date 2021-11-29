@@ -12,6 +12,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -31,7 +32,7 @@ class NoLoggingProducer implements org.apache.kafka.clients.producer.Producer<St
     @Override
     @Deprecated
     public void sendOffsetsToTransaction(
-            Map<TopicPartition, OffsetAndMetadata> map, String s) throws ProducerFencedException {
+            Map<TopicPartition, OffsetAndMetadata> var1, String var2) throws ProducerFencedException {
     }
 
     @Override
@@ -63,13 +64,13 @@ class NoLoggingProducer implements org.apache.kafka.clients.producer.Producer<St
     }
 
     @Override
-    public List<PartitionInfo> partitionsFor(String s) {
-        return null;
+    public List<PartitionInfo> partitionsFor(String var1) {
+        return Collections.emptyList();
     }
 
     @Override
     public Map<MetricName, ? extends Metric> metrics() {
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
