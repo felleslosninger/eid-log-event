@@ -22,7 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 public class EventLoggingConfig {
-    static final String CUSTOM_PRODUCER_PROPERTIES_FILE_PATH = "custom-kafka-producer.properties";
+    private static final String CUSTOM_PRODUCER_PROPERTIES_FILE_PATH = "custom-kafka-producer.properties";
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String EVENT_TOPIC_KEY = "event.topic";
@@ -164,7 +164,7 @@ public class EventLoggingConfig {
         return producerConfig;
     }
 
-    Properties overrideWithOptionalConfig(Properties originalProperties, String customConfigFilePath) {
+    private Properties overrideWithOptionalConfig(Properties originalProperties, String customConfigFilePath) {
         URL url = getClass().getClassLoader().getResource(customConfigFilePath);
         if (url != null) {
             Properties customProperties = loadPropertiesFromFile(customConfigFilePath);

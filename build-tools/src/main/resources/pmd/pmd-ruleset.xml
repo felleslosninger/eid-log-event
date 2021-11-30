@@ -8,7 +8,9 @@
         This ruleset defines the PMD rules for project "idporten-log-event".
     </description>
 
+    <!-- This file is auto-generated so no need to check it -->
     <exclude-pattern>.*/no/idporten/logging/event/EventRecord.*</exclude-pattern>
+    <!-- These files are copied from confluent in order to run local kafka in unit/integration-testing -->
     <exclude-pattern>.*/io/confluent/examples/streams/*.*</exclude-pattern>
 
     <rule ref="category/java/codestyle.xml">
