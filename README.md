@@ -106,3 +106,7 @@ When only the core library is used, the property is set in `event-logger.propert
 
 ### In idporten-log-event-spring-boot-starter
 When using the Spring Boot Starter, the property is set in `application.yml`. 
+
+## Tuning
+Kafka producer properties may be overriden by providing a file named `custom-kafka-producer.properties` at the root of 
+the classpath with entries from the [Kafka documentation](http://kafka.apache.org/documentation.html#producerconfigs). 
