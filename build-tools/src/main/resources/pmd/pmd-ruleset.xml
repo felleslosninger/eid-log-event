@@ -20,6 +20,7 @@
         <exclude name="TooManyStaticImports"/>
         <exclude name="OnlyOneReturn"/>
         <exclude name="ConfusingTernary"/>
+        <exclude name="DefaultPackage"/>
     </rule>
     <rule ref="category/java/bestpractices.xml">
         <exclude name="GuardLogStatement"/>
@@ -30,6 +31,7 @@
         <exclude name="BeanMembersShouldSerialize"/>
         <exclude name="NullAssignment"/>
         <exclude name="AvoidDuplicateLiterals"/>
+        <exclude name="UseProperClassLoader"/>
     </rule>
     <!-- many more rules are available at https://pmd.github.io/pmd-6.38.0/pmd_rules_java.html -->
 </ruleset>

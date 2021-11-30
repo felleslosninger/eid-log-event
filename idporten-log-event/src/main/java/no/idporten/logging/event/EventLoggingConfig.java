@@ -163,11 +163,7 @@ public class EventLoggingConfig {
     private Properties loadPropertiesFromFile(String propertiesFilePath) {
         Properties properties = new Properties();
 
-        try (
-                InputStream propertiesStream = Thread.currentThread()
-                        .getContextClassLoader()
-                        .getResourceAsStream(propertiesFilePath)
-        ) {
+        try (InputStream propertiesStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath)) {
             properties.load(propertiesStream);
         } catch (Exception e) {
             log.warn("Failed to load properties from {}", propertiesFilePath, e);
@@ -176,7 +172,7 @@ public class EventLoggingConfig {
     }
 
     public Map<String, Object> getProducerConfig() {
-        return producerConfig;
+        return Collections.unmodifiableMap(producerConfig);
     }
 
     public String getEventTopic() {
