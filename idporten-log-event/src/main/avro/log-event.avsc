@@ -29,6 +29,18 @@
         "null"
       ],
       "doc": "application generating the event"
+    },
+    {
+      "name": "created",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null,
+      "doc": "Timestamp for the creation of the event"
     }
   ]
 }

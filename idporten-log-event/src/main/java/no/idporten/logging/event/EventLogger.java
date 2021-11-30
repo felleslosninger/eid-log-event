@@ -1,5 +1,6 @@
 package no.idporten.logging.event;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -7,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,20 +38,25 @@ public class EventLogger {
             private int threadNumber = 0;
 
             @Override
-            public Thread newThread(Runnable r) {
+            public Thread newThread(@NonNull Runnable r) {
                 return new Thread(r, "eventLogPool-" + threadNumber++);
             }
         });
+    }
+
+    private static EventRecord ensureTimestamp(EventRecord eventRecord) {
+        if (eventRecord.getCreated() == null) {
+            eventRecord.setCreated(Instant.now());
+        }
+        return eventRecord;
     }
 
     public void log(EventRecord eventRecord) {
         ProducerRecord<String, EventRecord> producerRecord =
                 new ProducerRecord<>(
                         config.getEventTopic(),
-                        null, // no specific partition
-                        System.currentTimeMillis(), // instead of time it was sent
                         eventRecord.getPid().toString(),
-                        eventRecord);
+                        ensureTimestamp(eventRecord));
 
         Runnable task = () -> {
             try {
