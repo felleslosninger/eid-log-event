@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 public class EventLoggingConfig {
+    static final String CUSTOM_PRODUCER_PROPERTIES_FILE_PATH = "custom-kafka-producer.properties";
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String EVENT_TOPIC_KEY = "event.topic";
@@ -137,6 +139,8 @@ public class EventLoggingConfig {
 
     private Map<String, Object> createProducerConfig() {
         Properties kafkaProducerProperties = loadPropertiesFromFile(PRODUCER_PROPERTIES_FILE_PATH);
+        kafkaProducerProperties =
+                overrideWithOptionalConfig(kafkaProducerProperties, CUSTOM_PRODUCER_PROPERTIES_FILE_PATH);
         Map<String, Object> producerConfig = new HashMap<>(propertiesToMap(kafkaProducerProperties));
         producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
@@ -158,6 +162,15 @@ public class EventLoggingConfig {
 
 
         return producerConfig;
+    }
+
+    Properties overrideWithOptionalConfig(Properties originalProperties, String customConfigFilePath) {
+        URL url = getClass().getClassLoader().getResource(customConfigFilePath);
+        if (url != null) {
+            Properties customProperties = loadPropertiesFromFile(customConfigFilePath);
+            originalProperties.putAll(customProperties);
+        }
+        return originalProperties;
     }
 
     private Properties loadPropertiesFromFile(String propertiesFilePath) {

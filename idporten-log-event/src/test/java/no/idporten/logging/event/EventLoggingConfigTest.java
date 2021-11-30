@@ -172,4 +172,14 @@ class EventLoggingConfigTest {
                 "The userinfo is expected in the format username:password, when no password is provided the password should be empty");
     }
 
+    @Test
+    void overrideWithOptionalConfig() {
+        EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .bootstrapServers("broker")
+                .kafkaUsername("user")
+                .schemaRegistryUrl("registry")
+                .build();
+
+        assertEquals("32601", eventLoggingConfig.getProducerConfig().get("batch.size"));
+    }
 }
