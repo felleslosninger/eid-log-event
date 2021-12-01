@@ -9,9 +9,9 @@
     <version>0.0.3-SNAPSHOT</version>
 
     <modules>
+        <module>build-tools</module>
         <module>idporten-log-event</module>
         <module>idporten-log-event-spring-boot-starter</module>
-        <module>build-tools</module>
     </modules>
 
     <scm>
@@ -43,6 +43,8 @@
         <junit.version>5.8.1</junit.version>
         <mockito.version>4.1.0</mockito.version>
         <slf4j.version>1.7.32</slf4j.version>
+        <maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
+        <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
         <spring.boot.version>2.6.0</spring.boot.version>
     </properties>
 
@@ -167,7 +169,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>${maven-pmd-plugin.version}</version>
                 <configuration>
                     <rulesets>
                         <ruleset>pmd/pmd-ruleset.xml</ruleset>
@@ -185,14 +187,14 @@
                     <dependency>
                         <groupId>no.idporten.logging</groupId>
                         <artifactId>build-tools</artifactId>
-                        <version>1.0</version>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.2.0</version>
+                <version>${spotbugs-maven-plugin.version}</version>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Medium</threshold>
@@ -213,7 +215,7 @@
                     <dependency>
                         <groupId>no.idporten.logging</groupId>
                         <artifactId>build-tools</artifactId>
-                        <version>1.0</version>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

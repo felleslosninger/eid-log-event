@@ -2,6 +2,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.idporten.logging</groupId>
     <artifactId>build-tools</artifactId>
-    <version>1.0</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>Build Tools</name>
 </project>
