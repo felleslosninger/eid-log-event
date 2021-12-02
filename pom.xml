@@ -6,7 +6,7 @@
     <artifactId>idporten-log-event-parent</artifactId>
     <groupId>no.idporten.logging</groupId>
     <packaging>pom</packaging>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.3</version>
 
     <modules>
         <module>idporten-log-event</module>
@@ -17,7 +17,7 @@
         <connection>scm:git:https://github.com/felleslosninger/idporten-log-event.git</connection>
         <developerConnection>scm:git:https://github.com/felleslosninger/idporten-log-event.git</developerConnection>
         <url>https://github.com/felleslosninger/idporten-log-event</url>
-        <tag>HEAD</tag>
+        <tag>v0.0.3</tag>
     </scm>
 
     <properties>
