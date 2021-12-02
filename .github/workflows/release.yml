@@ -6,11 +6,11 @@ on:
       releaseVersion:
         description: "Default version to use when preparing a release."
         required: true
-        default: "0.0.3"
+        default: "0.0.4"
       developmentVersion:
         description: "Default version to use for new local working copy."
         required: true
-        default: "0.0.4-SNAPSHOT"
+        default: "0.0.5-SNAPSHOT"
 
 jobs:
   release:

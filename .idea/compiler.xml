@@ -11,5 +11,8 @@
         <module name="idporten-log-event-spring-boot-starter" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="build-tools" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>
