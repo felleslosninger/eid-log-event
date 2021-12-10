@@ -12,8 +12,8 @@
     {
       "name": "pid",
       "type": [
-        "string",
-        "null"
+        "null",
+        "string"
       ],
       "doc": "person identifier"
     },
@@ -25,8 +25,8 @@
     {
       "name": "service",
       "type": [
-        "string",
-        "null"
+        "null",
+        "string"
       ],
       "doc": "application generating the event"
     },
@@ -41,6 +41,24 @@
       ],
       "default": null,
       "doc": "Timestamp for the creation of the event"
+    },
+    {
+      "name": "environment",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Deployment environment the event originates from"
+    },
+    {
+      "name": "description",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Detailed description of the event"
     }
   ]
 }
