@@ -25,6 +25,7 @@ public class EventLoggingConfig {
     static final String CUSTOM_PRODUCER_PROPERTIES_FILE_PATH = "custom-kafka-producer.properties";
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
+    static final String APPLICATION_NAME = "application.name";
     static final String EVENT_TOPIC_KEY = "event.topic";
     static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
 
@@ -37,6 +38,11 @@ public class EventLoggingConfig {
      * Feature toggle
      */
     private final boolean featureEnabled;
+
+    /**
+     * Name of the application using this library
+     */
+    private final String applicationName;
 
     /**
      * Host and port of the kafka broker(s) <BR>
@@ -82,6 +88,7 @@ public class EventLoggingConfig {
     @Builder
     public EventLoggingConfig(
             Boolean featureEnabled,
+            String applicationName,
             String bootstrapServers,
             String schemaRegistryUrl,
             String kafkaUsername,
@@ -111,9 +118,11 @@ public class EventLoggingConfig {
             this.kafkaUsername = Objects.requireNonNull(kafkaUsername, String.format(
                     NULL_TEMPLATE,
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-            this.eventTopic = determineEventTopic(eventTopic, eventLoggerDefaultProperties);
+            this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
+            this.eventTopic = resolveProperty(EVENT_TOPIC_KEY, eventTopic, eventLoggerDefaultProperties);
             this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
         } else {
+            this.applicationName = null;
             this.bootstrapServers = null;
             this.schemaRegistryUrl = null;
             this.kafkaUsername = null;
@@ -129,11 +138,11 @@ public class EventLoggingConfig {
                         entry -> String.valueOf(entry.getValue())));
     }
 
-    private String determineEventTopic(String userSpecifiedEventTopic, Properties defaultProperties) {
-        if (isEmpty(userSpecifiedEventTopic)) {
-            return Objects.requireNonNull(defaultProperties.getProperty(EVENT_TOPIC_KEY), "No default eventTopic found");
+    private static String resolveProperty(String key, String userSpecifiedValue, Properties defaultProperties) {
+        if (isEmpty(userSpecifiedValue)) {
+            return Objects.requireNonNull(defaultProperties.getProperty(key), String.format("No default %s found", key));
         } else {
-            return userSpecifiedEventTopic;
+            return userSpecifiedValue;
         }
     }
 
@@ -187,6 +196,10 @@ public class EventLoggingConfig {
 
     public Map<String, Object> getProducerConfig() {
         return producerConfig;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
     }
 
     public String getEventTopic() {

@@ -18,6 +18,7 @@ class EventLoggingConfigTest {
     @Test
     void eventTopicIsSet() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
@@ -32,6 +33,7 @@ class EventLoggingConfigTest {
     @Test
     void eventTopicDefault() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
@@ -43,8 +45,19 @@ class EventLoggingConfigTest {
     }
 
     @Test
+    void applicationNameIsRequired() {
+        assertThrows(NullPointerException.class, () ->
+                EventLoggingConfig.builder()
+                .kafkaUsername("franz")
+                .bootstrapServers("server")
+                .schemaRegistryUrl("registry")
+                .build(), "ApplicationName is a required field");
+    }
+
+    @Test
     void bootstrapServersIsRequired() {
         assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
                 .build(), "BootStrapServers is a required field");
@@ -53,6 +66,7 @@ class EventLoggingConfigTest {
     @Test
     void schemaRegistryUrlIsRequired() {
         assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .kafkaUsername("abc")
                 .bootstrapServers("abc")
                 .build(), "schemaRegistryUrl is a required field");
@@ -61,6 +75,7 @@ class EventLoggingConfigTest {
     @Test
     void kafkaUsernameIsRequired() {
         assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .schemaRegistryUrl("abc")
                 .build(), "kafkaUsername is a required field");
@@ -69,6 +84,7 @@ class EventLoggingConfigTest {
     @Test
     void testFeatureEnabledDefault() {
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
@@ -79,6 +95,7 @@ class EventLoggingConfigTest {
     @Test
     void testFeatureEnabled() {
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
@@ -90,6 +107,7 @@ class EventLoggingConfigTest {
     @Test
     void testFeatureDisabled() {
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
@@ -101,6 +119,7 @@ class EventLoggingConfigTest {
     @Test
     void threadPoolSize() {
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
@@ -113,6 +132,7 @@ class EventLoggingConfigTest {
     @Test
     void threadPoolSizeDefault() {
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
@@ -124,6 +144,7 @@ class EventLoggingConfigTest {
     @Test
     void noSchemaRegistryUsername() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
@@ -138,6 +159,7 @@ class EventLoggingConfigTest {
     @Test
     void withSchemaRegistryUsernameAndPassword() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
@@ -157,6 +179,7 @@ class EventLoggingConfigTest {
     @Test
     void withSchemaRegistryUsernameAndNoPassword() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
@@ -175,6 +198,7 @@ class EventLoggingConfigTest {
     @Test
     void overrideWithOptionalConfig() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
                 .bootstrapServers("broker")
                 .kafkaUsername("user")
                 .schemaRegistryUrl("registry")

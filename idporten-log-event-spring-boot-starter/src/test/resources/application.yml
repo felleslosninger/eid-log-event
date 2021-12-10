@@ -11,5 +11,7 @@ digdir:
       thread-pool-size: 10
 
 spring:
+  application:
+    name: testEventLogger
   main:
     banner-mode: off

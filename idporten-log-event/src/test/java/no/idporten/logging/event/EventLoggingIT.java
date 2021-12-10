@@ -77,6 +77,7 @@ class EventLoggingIT {
                         .build());
 
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("integrationTest")
                 .bootstrapServers(cluster.bootstrapServers())
                 .schemaRegistryUrl(cluster.schemaRegistryUrl())
                 .kafkaUsername("franz")

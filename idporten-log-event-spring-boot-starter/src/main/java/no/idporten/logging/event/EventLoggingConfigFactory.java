@@ -1,5 +1,6 @@
 package no.idporten.logging.event;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,10 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(EventLoggingConfigurationProperties.class)
 class EventLoggingConfigFactory {
 
+    @Value("${spring.application.name}")
+    private String applicationName;
+
     @Bean
     @ConditionalOnMissingBean
     public EventLoggingConfig eventLoggingConfig(EventLoggingConfigurationProperties eventLoggingConfigurationProperties) {
         return EventLoggingConfig.builder()
+                .applicationName(applicationName)
                 .bootstrapServers(eventLoggingConfigurationProperties.getBootstrapServers())
                 .featureEnabled(eventLoggingConfigurationProperties.isFeatureEnabled())
                 .eventTopic(eventLoggingConfigurationProperties.getEventTopic())

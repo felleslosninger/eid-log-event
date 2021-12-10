@@ -28,6 +28,7 @@ class EventLoggerTest {
     private static final String DUMMY_URL = "https://localhost:443";
     private static final String USERNAME = "username";
     private static final String FNR = "25079494081";
+    private static final String APPLICATION_NAME = "testApplication";
     private final EventRecord record = EventRecord.newBuilder()
             .setName("Innlogget")
             .setPid(FNR)
@@ -39,6 +40,7 @@ class EventLoggerTest {
     @BeforeEach
     void setUp() {
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
@@ -109,7 +111,8 @@ class EventLoggerTest {
         assertEquals(null, record.getCreated(), "Unexpected initialization of record creation time");
 
         eventLogger.log(record);
-        assertTrue(now.isBefore(record.getCreated()) && now.plusMillis(100).isAfter(record.getCreated()),
+        assertTrue((now.compareTo(record.getCreated()) == 0) ||
+                        (now.isBefore(record.getCreated()) && now.plusMillis(100).isAfter(record.getCreated())),
                 "Creation timestamp not close enough to current time");
     }
 
@@ -118,6 +121,7 @@ class EventLoggerTest {
         assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
