@@ -7,28 +7,38 @@
     {
       "name": "name",
       "type": "string",
-      "doc": "name of the event, typically a type of change"
+      "doc": "Name of the event, typically a type of change"
     },
     {
       "name": "pid",
       "type": [
-        "string",
-        "null"
+        "null",
+        "string"
       ],
-      "doc": "person identifier"
+      "doc": "Person identifier"
     },
     {
       "name": "correlation_id",
       "type": "string",
-      "doc": "identifier for tracking related events"
+      "doc": "Identifier for tracking related events"
+    },
+    {
+      "name": "application",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Application generating the event"
     },
     {
       "name": "service",
       "type": [
-        "string",
-        "null"
+        "null",
+        "string"
       ],
-      "doc": "application generating the event"
+      "default": null,
+      "doc": "Service the identity is used for"
     },
     {
       "name": "created",
@@ -41,6 +51,24 @@
       ],
       "default": null,
       "doc": "Timestamp for the creation of the event"
+    },
+    {
+      "name": "environment",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Deployment environment the event originates from"
+    },
+    {
+      "name": "description",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Detailed description of the event"
     }
   ]
 }

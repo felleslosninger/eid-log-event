@@ -26,6 +26,16 @@ class EventLoggingConfigFactoryTest {
     private EventLoggingConfig eventLoggingConfig;
 
     @Test
+    void applicationNameSetFromYaml() {
+        assertEquals("testEventLogger", String.valueOf(eventLoggingConfig.getApplicationName()));
+    }
+
+    @Test
+    void environmentNameSetFromYaml() {
+        assertEquals("dev", String.valueOf(eventLoggingConfig.getEnvironmentName()));
+    }
+
+    @Test
     void kafkaUsernameCanBeSetFromYaml() {
         assertTrue(String.valueOf(eventLoggingConfig.getProducerConfig().get(SaslConfigs.SASL_JAAS_CONFIG))
                 .contains("username=\"franz\""), "Franz username should be contained in authentication string");

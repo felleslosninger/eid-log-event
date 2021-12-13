@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,22 +29,29 @@ class EventLoggerTest {
     private static final String DUMMY_URL = "https://localhost:443";
     private static final String USERNAME = "username";
     private static final String FNR = "25079494081";
+    private static final String APPLICATION_NAME = "testApplication";
+    private static final String ENVIRONMENT_NAME = "unitTest";
+
+    private final EventLoggingConfig config = EventLoggingConfig.builder()
+            .applicationName(APPLICATION_NAME)
+            .environmentName(ENVIRONMENT_NAME)
+            .bootstrapServers(DUMMY_URL)
+            .schemaRegistryUrl(DUMMY_URL)
+            .kafkaUsername(USERNAME)
+            .build();
+
     private final EventRecord record = EventRecord.newBuilder()
             .setName("Innlogget")
+            .setDescription("Brukeren har logget inn")
             .setPid(FNR)
             .setCorrelationId(UUID.randomUUID().toString())
             .setService("idPorten")
             .build();
+
     private EventLogger eventLogger;
 
     @BeforeEach
     void setUp() {
-        EventLoggingConfig config = EventLoggingConfig.builder()
-                .bootstrapServers(DUMMY_URL)
-                .schemaRegistryUrl(DUMMY_URL)
-                .kafkaUsername(USERNAME)
-                .build();
-
         MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
         SpecificAvroSerde<EventRecord> serde = new SpecificAvroSerde<>(schemaRegistryClient);
         serde.configure(config.getProducerConfig(), false);
@@ -78,6 +86,8 @@ class EventLoggerTest {
     @Test
     void noLoggingWhenDisabled() {
         EventLoggingConfig disablingConfig = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
@@ -104,13 +114,47 @@ class EventLoggerTest {
     }
 
     @Test
-    void defaultCreationTimestamp() {
-        Instant now = Instant.now();
-        assertEquals(null, record.getCreated(), "Unexpected initialization of record creation time");
+    void defaultCreationTimestamp() throws ExecutionException, InterruptedException {
+        assertNull(record.getCreated(), "Test is void: created time set directly on record");
 
         eventLogger.log(record);
-        assertTrue(now.isBefore(record.getCreated()) && now.plusMillis(100).isAfter(record.getCreated()),
-                "Creation timestamp not close enough to current time");
+        eventLogger.producer.flush();
+        MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
+        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+
+        assertEquals(1, sentEventsFuture.get(), "Record should be published");
+        EventRecord loggedRecord = mockProducer.history().get(0).value();
+
+        assertTrue(Instant.now().isAfter(loggedRecord.getCreated()),
+                "Creation timestamp should be earlier than current time");
+    }
+
+    @Test
+    void defaultApplicationName() throws ExecutionException, InterruptedException {
+        assertNull(record.getApplication(), "Test is void: application name set directly on record");
+
+        eventLogger.log(record);
+        eventLogger.producer.flush();
+        MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
+        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+
+        assertEquals(1, sentEventsFuture.get(), "Record should be published");
+        EventRecord loggedRecord = mockProducer.history().get(0).value();
+        assertEquals(APPLICATION_NAME, loggedRecord.getApplication(), "Application name not set from config");
+    }
+
+    @Test
+    void defaultEnvironmentName() throws ExecutionException, InterruptedException {
+        assertNull(record.getApplication(), "Test is void: environment name set directly on record");
+
+        eventLogger.log(record);
+        eventLogger.producer.flush();
+        MockProducer<String, EventRecord> mockProducer = (MockProducer<String, EventRecord>) eventLogger.producer;
+        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+
+        assertEquals(1, sentEventsFuture.get(), "Record should be published");
+        EventRecord loggedRecord = mockProducer.history().get(0).value();
+        assertEquals(ENVIRONMENT_NAME, loggedRecord.getEnvironment(), "Environment name not set from config");
     }
 
     @Test
@@ -118,6 +162,8 @@ class EventLoggerTest {
         assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)

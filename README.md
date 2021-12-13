@@ -7,7 +7,8 @@ Core library with minimal dependencies
 
 ### Build
 
-Import the library with Maven:
+Pick a [release](https://github.com/felleslosninger/idporten-log-event/releases) 
+and import the library with Maven:
 
 ```xml
     <dependency>
@@ -16,17 +17,28 @@ Import the library with Maven:
         <version>${idporten-event-log.version}</version>
     </dependency>
 ```
-
+Since we use libraries from [Confluent](https://confluent.io), you may need to add their repository:
+```xml
+    <repositories>
+        <repository>
+            <id>Confluent</id>
+            <name>Confluent Kafka</name>
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
+```
 ### Configuration
 
 A Kafka-client needs to find servers and uses a thread-pool to publish events.
 Use `EventLoggingConfig.builder()` to configure the settings:
 
 ```java
-import no.idporten.logging.event.config.EventLogger;
+import no.idporten.logging.event.EventLogger;
 import no.idporten.logging.event.EventLoggingConfig;
 [...]
         EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(BROKER_HOST_AND_PORT)
                 .schemaRegistryUrl(REGISTRY_HOST_AND_PORT)
                 .kafkaUsername(USERNAME)
@@ -42,7 +54,7 @@ import no.idporten.logging.event.EventLoggingConfig;
 Use `EventRecord.newBuilder()` to create an entry to publish:
 
 ```java
-import no.idporten.logging.event.config.EventRecord;
+import no.idporten.logging.event.EventRecord;
 [...]
         EventRecord record = EventRecord.newBuilder()
                 .setName("Innlogget")
@@ -53,6 +65,9 @@ import no.idporten.logging.event.config.EventRecord;
 
         eventLogger.log(record);
 ```
+
+Explore the `no.idporten.logging.event.EventRecord` class for further optional attributes.
+The `created`-attribute will default to current time, if not specified.
 
 ## idporten-log-event-spring-boot-starter
 Spring Boot Starter for autoconfiguration of the library
@@ -72,6 +87,7 @@ The library is configured through the `application.yml` file.
 digdir:
   event:
     logging:
+      environment-name: dev
       bootstrap-servers: example.com:80
       schema-registry-url: example.com:80
       kafka-username: kafkaUsername
@@ -80,6 +96,11 @@ digdir:
       schema-registry-username: schemaUsername
       event-topic: eventTopic
       thread-pool-size: 8 # Defaults to 4 if not set
+
+spring:
+  application:
+    name: myApplication
+
 ```
 ### Usage
 Simply wire in the Spring Boot-configured `EventLogger`:
@@ -98,6 +119,10 @@ Simply wire in the Spring Boot-configured `EventLogger`:
 
             eventLogger.log(record);
 ```
+
+Explore the `no.idporten.logging.event.EventRecord` class for further optional attributes.
+The `created`-attribute will default to current time, if not specified.
+
 ## Feature toggling
 Publishing to Kafka can be disabled by setting the `digdir.event.logging.feature-enabled` property to `false`.
 

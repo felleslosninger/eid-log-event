@@ -44,19 +44,23 @@ public class EventLogger {
         });
     }
 
-    private static EventRecord ensureTimestamp(EventRecord eventRecord) {
-        if (eventRecord.getCreated() == null) {
-            eventRecord.setCreated(Instant.now());
-        }
-        return eventRecord;
+    private static EventRecord enrichRecord(EventRecord eventRecord, EventLoggingConfig config) {
+        return EventRecord.newBuilder(eventRecord)
+                .setApplication(eventRecord.getApplication() == null ?
+                        config.getApplicationName() : eventRecord.getApplication())
+                .setEnvironment(eventRecord.getEnvironment() == null ?
+                        config.getEnvironmentName() : eventRecord.getEnvironment())
+                .setCreated(eventRecord.getCreated() == null ? Instant.now() : eventRecord.getCreated())
+                .build();
     }
 
     public void log(EventRecord eventRecord) {
+        EventRecord enrichedRecord = enrichRecord(eventRecord, config);
         ProducerRecord<String, EventRecord> producerRecord =
                 new ProducerRecord<>(
                         config.getEventTopic(),
                         eventRecord.getPid().toString(),
-                        ensureTimestamp(eventRecord));
+                        enrichedRecord);
 
         Runnable task = () -> {
             try {
