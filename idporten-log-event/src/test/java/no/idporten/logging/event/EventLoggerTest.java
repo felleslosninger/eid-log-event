@@ -125,8 +125,8 @@ class EventLoggerTest {
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
         EventRecord loggedRecord = mockProducer.history().get(0).value();
 
-        assertTrue(Instant.now().plusMillis(100).isAfter(loggedRecord.getCreated()),
-                "Creation timestamp not close enough to current time");
+        assertTrue(Instant.now().isAfter(loggedRecord.getCreated()),
+                "Creation timestamp should be earlier than current time");
     }
 
     @Test
