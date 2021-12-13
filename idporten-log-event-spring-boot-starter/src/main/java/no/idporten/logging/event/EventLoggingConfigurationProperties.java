@@ -12,6 +12,7 @@ import java.util.Optional;
 @Getter(AccessLevel.PACKAGE)
 class EventLoggingConfigurationProperties {
     private final boolean featureEnabled;
+    private final String environmentName;
     private final String bootstrapServers;
     private final String schemaRegistryUrl;
     private final String kafkaUsername;
@@ -23,6 +24,7 @@ class EventLoggingConfigurationProperties {
 
     EventLoggingConfigurationProperties(
             Boolean featureEnabled,
+            String environmentName,
             String bootstrapServers,
             String schemaRegistryUrl,
             String kafkaUsername,
@@ -32,6 +34,7 @@ class EventLoggingConfigurationProperties {
             String eventTopic,
             Integer threadPoolSize) {
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
+        this.environmentName = environmentName;
         this.bootstrapServers = bootstrapServers;
         this.schemaRegistryUrl = schemaRegistryUrl;
         this.kafkaUsername = kafkaUsername;

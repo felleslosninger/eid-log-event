@@ -20,6 +20,7 @@ class EventLoggingConfigFactory {
     public EventLoggingConfig eventLoggingConfig(EventLoggingConfigurationProperties eventLoggingConfigurationProperties) {
         return EventLoggingConfig.builder()
                 .applicationName(applicationName)
+                .environmentName(eventLoggingConfigurationProperties.getEnvironmentName())
                 .bootstrapServers(eventLoggingConfigurationProperties.getBootstrapServers())
                 .featureEnabled(eventLoggingConfigurationProperties.isFeatureEnabled())
                 .eventTopic(eventLoggingConfigurationProperties.getEventTopic())

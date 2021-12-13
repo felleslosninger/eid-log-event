@@ -3,6 +3,7 @@ package no.idporten.logging.event;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -26,6 +27,7 @@ public class EventLoggingConfig {
     static final String BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO = "USER_INFO";
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String APPLICATION_NAME = "application.name";
+    static final String ENVIRONMENT_NAME = "environment.name";
     static final String EVENT_TOPIC_KEY = "event.topic";
     static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
 
@@ -37,12 +39,20 @@ public class EventLoggingConfig {
     /**
      * Feature toggle
      */
+    @Getter
     private final boolean featureEnabled;
 
     /**
      * Name of the application using this library
      */
+    @Getter
     private final String applicationName;
+
+    /**
+     * Name of the environment where the application is running
+     */
+    @Getter
+    private final String environmentName;
 
     /**
      * Host and port of the kafka broker(s) <BR>
@@ -78,17 +88,21 @@ public class EventLoggingConfig {
     /**
      * Kafka topic to publish to
      */
+    @Getter
     private final String eventTopic;
     /**
      * Number of working threads in the eventLoggerThreadPool.
      */
+    @Getter
     private final int threadPoolSize;
+    @Getter
     private final Map<String, Object> producerConfig;
 
     @Builder
     public EventLoggingConfig(
             Boolean featureEnabled,
             String applicationName,
+            String environmentName,
             String bootstrapServers,
             String schemaRegistryUrl,
             String kafkaUsername,
@@ -119,10 +133,12 @@ public class EventLoggingConfig {
                     NULL_TEMPLATE,
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
             this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
+            this.environmentName = resolveProperty(ENVIRONMENT_NAME, environmentName, eventLoggerDefaultProperties);
             this.eventTopic = resolveProperty(EVENT_TOPIC_KEY, eventTopic, eventLoggerDefaultProperties);
             this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
         } else {
             this.applicationName = null;
+            this.environmentName = null;
             this.bootstrapServers = null;
             this.schemaRegistryUrl = null;
             this.kafkaUsername = null;
@@ -194,23 +210,4 @@ public class EventLoggingConfig {
         return properties;
     }
 
-    public Map<String, Object> getProducerConfig() {
-        return producerConfig;
-    }
-
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public String getEventTopic() {
-        return eventTopic;
-    }
-
-    public boolean isFeatureEnabled() {
-        return featureEnabled;
-    }
-
-    public int getThreadPoolSize() {
-        return threadPoolSize;
-    }
 }

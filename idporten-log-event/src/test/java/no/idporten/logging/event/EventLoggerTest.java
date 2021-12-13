@@ -29,8 +29,10 @@ class EventLoggerTest {
     private static final String USERNAME = "username";
     private static final String FNR = "25079494081";
     private static final String APPLICATION_NAME = "testApplication";
+    private static final String ENVIRONMENT_NAME = "unitTest";
     private final EventRecord record = EventRecord.newBuilder()
             .setName("Innlogget")
+            .setDescription("Brukeren har logget inn")
             .setPid(FNR)
             .setCorrelationId(UUID.randomUUID().toString())
             .setService("idPorten")
@@ -41,6 +43,7 @@ class EventLoggerTest {
     void setUp() {
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
@@ -80,6 +83,8 @@ class EventLoggerTest {
     @Test
     void noLoggingWhenDisabled() {
         EventLoggingConfig disablingConfig = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
@@ -122,6 +127,7 @@ class EventLoggerTest {
         assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
                 .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
                 .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)

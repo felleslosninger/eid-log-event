@@ -1,6 +1,7 @@
 digdir:
   event:
     logging:
+      environment-name: dev
       bootstrap-servers: localhost:443
       schema-registry-url: localhost:443
       kafka-username: franz

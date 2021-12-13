@@ -59,18 +59,21 @@ class EventLoggingIT {
         final List<EventRecord> inputValues = Arrays.asList(
                 EventRecord.newBuilder()
                         .setName("Innlogget")
+                        .setDescription("Brukeren har logget inn")
                         .setPid("24079409630")
                         .setCorrelationId(UUID.randomUUID().toString())
                         .setService("idPorten")
                         .build(),
                 EventRecord.newBuilder()
                         .setName("Utlogget")
+                        .setDescription("Brukeren har logget ut")
                         .setPid("24079409479")
                         .setCorrelationId(UUID.randomUUID().toString())
                         .setService("idPorten")
                         .build(),
                 EventRecord.newBuilder()
                         .setName("Endret")
+                        .setDescription("Brukeren har endret passordet sitt")
                         .setPid("24079409398")
                         .setCorrelationId(UUID.randomUUID().toString())
                         .setService("idPorten")
@@ -78,6 +81,7 @@ class EventLoggingIT {
 
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .applicationName("integrationTest")
+                .environmentName("embedded")
                 .bootstrapServers(cluster.bootstrapServers())
                 .schemaRegistryUrl(cluster.schemaRegistryUrl())
                 .kafkaUsername("franz")
