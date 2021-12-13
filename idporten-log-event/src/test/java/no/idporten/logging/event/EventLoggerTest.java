@@ -31,6 +31,7 @@ class EventLoggerTest {
     private static final String FNR = "25079494081";
     private static final String APPLICATION_NAME = "testApplication";
     private static final String ENVIRONMENT_NAME = "unitTest";
+    private static final int POOL_SIZE = 1;
 
     private final EventLoggingConfig config = EventLoggingConfig.builder()
             .applicationName(APPLICATION_NAME)
@@ -38,6 +39,7 @@ class EventLoggerTest {
             .bootstrapServers(DUMMY_URL)
             .schemaRegistryUrl(DUMMY_URL)
             .kafkaUsername(USERNAME)
+            .threadPoolSize(POOL_SIZE)
             .build();
 
     private final EventRecord record = EventRecord.newBuilder()
@@ -160,7 +162,8 @@ class EventLoggerTest {
     @Test
     void threadPoolSize() {
         assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
-        assertEquals(4, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "Default poolSize should be 4");
+        assertEquals(POOL_SIZE, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(),
+                "PoolSize should have been initialized to " + POOL_SIZE);
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
                 .applicationName(APPLICATION_NAME)
                 .environmentName(ENVIRONMENT_NAME)

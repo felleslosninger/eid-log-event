@@ -1,16 +1,6 @@
 name: Release to GitHub Packages
 
-on:
-  workflow_dispatch:
-    inputs:
-      releaseVersion:
-        description: "Default version to use when preparing a release."
-        required: true
-        default: "0.0.3"
-      developmentVersion:
-        description: "Default version to use for new local working copy."
-        required: true
-        default: "0.0.4-SNAPSHOT"
+on: workflow_dispatch
 
 jobs:
   release:
@@ -35,4 +25,4 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: mvn release:prepare release:perform -U -B -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} -Dusername="${{env.GITHUB_ACTOR}}" -Dpassword="${{env.GITHUB_TOKEN}}"
+        run: mvn release:prepare release:perform -U -B -Dusername="${{env.GITHUB_ACTOR}}" -Dpassword="${{env.GITHUB_TOKEN}}"
