@@ -47,7 +47,9 @@ class EventLoggerTest {
             .setDescription("Brukeren har logget inn")
             .setPid(FNR)
             .setCorrelationId(UUID.randomUUID().toString())
-            .setService("idPorten")
+            .setClient("McDuck IT")
+            .setRepresenting("Andeby kommune")
+            .setAuthmethod("OTC")
             .build();
 
     private EventLogger eventLogger;
