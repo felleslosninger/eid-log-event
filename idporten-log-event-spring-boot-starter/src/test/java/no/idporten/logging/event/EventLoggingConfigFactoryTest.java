@@ -92,7 +92,9 @@ class EventLoggingConfigFactoryTest {
                 .setName("Innlogget")
                 .setPid("25079494081")
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setService("idPorten")
+                .setClient("Ansattportalen")
+                .setEid("MinID")
+                .setAuthmethod("OTC")
                 .build();
 
         eventLogger.log(record);

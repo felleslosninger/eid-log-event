@@ -28,7 +28,9 @@ class EventLoggingDisabledFactoryTest {
                 .setName("Innlogget")
                 .setPid("25079494081")
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setService("idPorten")
+                .setClient("NAV")
+                .setEid("CommFides")
+                .setAuthmethod("PIN")
                 .build();
 
         eventLogger.log(record);

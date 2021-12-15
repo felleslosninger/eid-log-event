@@ -32,13 +32,40 @@
       "doc": "Application generating the event"
     },
     {
-      "name": "service",
+      "name": "client",
       "type": [
         "null",
         "string"
       ],
       "default": null,
-      "doc": "Service the identity is used for"
+      "doc": "The client is the system requiring the access"
+    },
+    {
+      "name": "representing",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The organisation that the client is acting on behalf of"
+    },
+    {
+      "name": "eid",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The electronic identity issuer"
+    },
+    {
+      "name": "authmethod",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The method used to authenticate the identity"
     },
     {
       "name": "created",
