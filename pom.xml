@@ -41,7 +41,7 @@
         <avro.version>1.11.0</avro.version>
         <junit.version>5.8.2</junit.version>
         <mockito.version>4.1.0</mockito.version>
-        <log4j2.version>2.16.0</log4j2.version>
+        <log4j2.version>2.17.0</log4j2.version>
         <slf4j.version>1.7.32</slf4j.version>
         <spring.boot.version>2.6.1</spring.boot.version>
     </properties>
