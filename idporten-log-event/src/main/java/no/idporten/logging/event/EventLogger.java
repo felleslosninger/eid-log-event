@@ -30,18 +30,22 @@ public class EventLogger {
         if (config.isFeatureEnabled()) {
             this.producer = new KafkaProducer<>(config.getProducerConfig());
         } else {
-            this.producer = new NoLoggingProducer();
+            this.producer = new NoLoggingProducer<>();
             log.info("Event logging disabled through property {}={}", FEATURE_ENABLED_KEY, config.isFeatureEnabled());
         }
 
-        pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), new ThreadFactory() {
+        pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), buildThreadFactory());
+    }
+
+    static ThreadFactory buildThreadFactory() {
+        return new ThreadFactory() {
             private int threadNumber = 0;
 
             @Override
             public Thread newThread(@NonNull Runnable r) {
                 return new Thread(r, "eventLogPool-" + threadNumber++);
             }
-        });
+        };
     }
 
     private static EventRecord enrichRecord(EventRecord eventRecord, EventLoggingConfig config) {
