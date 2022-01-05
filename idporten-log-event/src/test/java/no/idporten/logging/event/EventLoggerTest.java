@@ -162,6 +162,12 @@ class EventLoggerTest {
     }
 
     @Test
+    void silentFailing() {
+        eventLogger.finalize(); // producer is closed
+        eventLogger.log(record);
+    }
+
+    @Test
     void threadPoolSize() {
         assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(POOL_SIZE, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(),

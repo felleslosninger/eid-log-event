@@ -1,7 +1,6 @@
 package no.idporten.logging.event;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -10,7 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static no.idporten.logging.event.EventLogger.buildThreadFactory;
-import static no.idporten.logging.event.EventLoggingConfig.FEATURE_ENABLED_KEY;
+import static no.idporten.logging.event.EventLogger.createSendTask;
+import static no.idporten.logging.event.EventLogger.resolveProducer;
 
 @Slf4j
 public class MaskinportenEventLogger {
@@ -21,15 +21,8 @@ public class MaskinportenEventLogger {
 
     public MaskinportenEventLogger(EventLoggingConfig eventLoggingConfig) {
         this.config = eventLoggingConfig;
-
-        if (config.isFeatureEnabled()) {
-            this.producer = new KafkaProducer<>(config.getProducerConfig());
-        } else {
-            this.producer = new NoLoggingProducer();
-            log.info("Event logging disabled through property {}={}", FEATURE_ENABLED_KEY, config.isFeatureEnabled());
-        }
-
-        pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), buildThreadFactory());
+        this.producer = resolveProducer(config);
+        this.pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), buildThreadFactory());
     }
 
     private static MaskinportenEventRecord enrichRecord(
@@ -52,20 +45,7 @@ public class MaskinportenEventLogger {
                         eventRecord.getConsumer().toString(),
                         enrichedRecord);
 
-        Runnable task = () -> {
-            try {
-                producer.send(producerRecord, (recordMetadata, e) -> {
-                    if (e != null) {
-                        log.warn("Failed to publish event {}", eventRecord, e);
-                    } else if (log.isTraceEnabled() && recordMetadata != null) {
-                        log.trace("Sent record {} with offset {}", producerRecord, recordMetadata.offset());
-                    }
-                });
-            } catch (Exception e) {
-                log.warn("Failed to publish event {}", eventRecord, e);
-            }
-        };
-
+        Runnable task = createSendTask(producerRecord, producer);
         pool.submit(task);
     }
 
