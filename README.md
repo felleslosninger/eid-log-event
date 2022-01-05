@@ -123,6 +123,76 @@ Simply wire in the Spring Boot-configured `EventLogger`:
 Explore the `no.idporten.logging.event.EventRecord` class for further optional attributes.
 The `created`-attribute will default to current time, if not specified.
 
+## maskinporten-log-event
+For publishing events related to tokens from **Maskinporten**, there is a specific library with attributes better suited for records documenting *access tokens*.
+
+### Build
+Import the library with Maven:
+
+```xml
+    <dependency>
+        <groupId>no.idporten.logging</groupId>
+        <artifactId>maskinporten-log-event</artifactId>
+        <version>${maskinporten.log.event.version}</version>
+    </dependency>
+```
+
+### Configuration
+The library is configured through the `application.yml` file.
+```yaml
+digdir:
+  event:
+    logging:
+      environment-name: dev
+      event-topic: maskinportenEventTopic
+      bootstrap-servers: example.com:80
+      kafka-username: kafkaUsername
+      kafka-password: kafkaPassword
+      schema-registry-url: example.com:80
+      schema-registry-password: schemaPassword
+      schema-registry-username: schemaUsername
+
+spring:
+  application:
+    name: myApplication
+
+```
+
+Use `EventLoggingConfig.builder()` to configure the settings:
+
+```java
+import no.idporten.logging.event.EventLoggingConfig;
+import no.idporten.logging.event.MaskinportenEventLogger;
+[...]
+        EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
+                .eventTopic(MASKINPORTEN_TOPIC)
+                .bootstrapServers(BROKER_HOST_AND_PORT)
+                .kafkaUsername(KAFKA_USERNAME)
+                .kafkaPassword(KAFKA_PASSWORD)
+                .schemaRegistryUrl(REGISTRY_HOST_AND_PORT)
+                .schemaRegistryUsername(REGISTRY_USERNAME)
+                .schemaRegistryPassword(REGISTRY_PASSWORD)
+                .build();
+
+        MaskinportenEventLogger eventLogger = new MaskinportenEventLogger(config);
+```
+
+### Usage
+Use `MaskinportenEventRecord.newBuilder()` to create an entry to publish:
+```java
+import no.idporten.logging.event.MaskinportenEventRecord;
+[...]
+        MaskinportenEventRecord record = MaskinportenEventRecord.newBuilder()
+                .setCorrelationId(correlationId)
+                .setName("Token issued")
+[...]
+                .build();
+
+        eventLogger.log(record);
+```
+
 ## Feature toggling
 Publishing to Kafka can be disabled by setting the `digdir.event.logging.feature-enabled` property to `false`.
 
