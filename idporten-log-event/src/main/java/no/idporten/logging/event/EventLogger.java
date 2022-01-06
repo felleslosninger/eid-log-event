@@ -2,6 +2,7 @@ package no.idporten.logging.event;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -26,22 +27,28 @@ public class EventLogger {
 
     public EventLogger(EventLoggingConfig eventLoggingConfig) {
         this.config = eventLoggingConfig;
+        this.producer = resolveProducer(config);
+        this.pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), buildThreadFactory());
+    }
 
+    static <T extends SpecificRecordBase> Producer<String, T> resolveProducer(EventLoggingConfig config) {
         if (config.isFeatureEnabled()) {
-            this.producer = new KafkaProducer<>(config.getProducerConfig());
+            return new KafkaProducer<>(config.getProducerConfig());
         } else {
-            this.producer = new NoLoggingProducer();
             log.info("Event logging disabled through property {}={}", FEATURE_ENABLED_KEY, config.isFeatureEnabled());
+            return new NoLoggingProducer<>();
         }
+    }
 
-        pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), new ThreadFactory() {
+    static ThreadFactory buildThreadFactory() {
+        return new ThreadFactory() {
             private int threadNumber = 0;
 
             @Override
             public Thread newThread(@NonNull Runnable r) {
                 return new Thread(r, "eventLogPool-" + threadNumber++);
             }
-        });
+        };
     }
 
     private static EventRecord enrichRecord(EventRecord eventRecord, EventLoggingConfig config) {
@@ -54,6 +61,25 @@ public class EventLogger {
                 .build();
     }
 
+    static <T extends SpecificRecordBase> Runnable createSendTask(
+            ProducerRecord<String, T> producerRecord,
+            Producer<String, T> producer) {
+
+        return () -> {
+            try {
+                producer.send(producerRecord, (recordMetadata, e) -> {
+                    if (e != null) {
+                        log.warn("Failed to publish event {}", producerRecord.value(), e);
+                    } else if (log.isTraceEnabled() && recordMetadata != null) {
+                        log.trace("Sent record {} with offset {}", producerRecord, recordMetadata.offset());
+                    }
+                });
+            } catch (Exception e) {
+                log.warn("Failed to publish event {}", producerRecord.value(), e);
+            }
+        };
+    }
+
     public void log(EventRecord eventRecord) {
         EventRecord enrichedRecord = enrichRecord(eventRecord, config);
         ProducerRecord<String, EventRecord> producerRecord =
@@ -62,20 +88,7 @@ public class EventLogger {
                         eventRecord.getPid().toString(),
                         enrichedRecord);
 
-        Runnable task = () -> {
-            try {
-                producer.send(producerRecord, (recordMetadata, e) -> {
-                    if (e != null) {
-                        log.warn("Failed to publish event {}", eventRecord, e);
-                    } else if (log.isTraceEnabled() && recordMetadata != null) {
-                        log.trace("Sent record {} with offset {}", producerRecord, recordMetadata.offset());
-                    }
-                });
-            } catch (Exception e) {
-                log.warn("Failed to publish event {}", eventRecord, e);
-            }
-        };
-
+        Runnable task = createSendTask(producerRecord, producer);
         pool.submit(task);
     }
 
@@ -103,7 +116,8 @@ public class EventLogger {
                     threadPoolExecutor.getActiveCount(),
                     threadPoolExecutor.getQueue().size());
         } else {
-            return "Cannot get ThreadPool queueStats as ExecutorService is not of type ThreadPoolExecutor. It was type: " + pool.getClass();
+            return "Cannot get ThreadPool queueStats as ExecutorService is not of type ThreadPoolExecutor. It was type: "
+                    + pool.getClass();
         }
     }
 }

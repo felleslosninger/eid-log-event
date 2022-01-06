@@ -11,6 +11,7 @@
     <modules>
         <module>idporten-log-event</module>
         <module>idporten-log-event-spring-boot-starter</module>
+        <module>maskinporten-log-event</module>
     </modules>
 
     <scm>

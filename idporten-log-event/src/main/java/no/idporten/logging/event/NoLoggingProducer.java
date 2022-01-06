@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 /**
  * No-op class used when the logging feature is disabled
  */
-class NoLoggingProducer implements org.apache.kafka.clients.producer.Producer<String, EventRecord> {
+class NoLoggingProducer<T> implements org.apache.kafka.clients.producer.Producer<String, T> {
     @Override
     public void initTransactions() {
     }
@@ -49,12 +49,12 @@ class NoLoggingProducer implements org.apache.kafka.clients.producer.Producer<St
     }
 
     @Override
-    public Future<RecordMetadata> send(ProducerRecord<String, EventRecord> producerRecord) {
+    public Future<RecordMetadata> send(ProducerRecord<String, T> producerRecord) {
         return null;
     }
 
     @Override
-    public Future<RecordMetadata> send(ProducerRecord<String, EventRecord> producerRecord, Callback callback) {
+    public Future<RecordMetadata> send(ProducerRecord<String, T> producerRecord, Callback callback) {
         return null;
     }
 
