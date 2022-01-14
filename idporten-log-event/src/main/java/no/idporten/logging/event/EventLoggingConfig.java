@@ -33,7 +33,7 @@ public class EventLoggingConfig {
 
     private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
     private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
-    private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.plain.PlainLoginModule " +
+    private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.scram.ScramLoginModule " +
             "required username=\"%s\" password=\"%s\";";
     private static final String NULL_TEMPLATE = "%s must not be null. Please check the configuration.";
     /**
