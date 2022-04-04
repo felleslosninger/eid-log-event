@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>artifactory</project.scm.id>
         <artifactory.url>http://eid-artifactory.dmz.local:8080/artifactory</artifactory.url>
-        <kafka.version>7.0.1-ce</kafka.version>
+        <kafka.version>7.0.2-ce</kafka.version>
         <confluent.version>7.0.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <curator.version>5.2.1</curator.version>
