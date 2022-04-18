@@ -11,6 +11,7 @@ import org.apache.kafka.common.MetricName;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -85,11 +86,30 @@ public class EventLogger {
         ProducerRecord<String, EventRecord> producerRecord =
                 new ProducerRecord<>(
                         config.getEventTopic(),
-                        eventRecord.getPid().toString(),
+                        createKafkaKey(enrichedRecord),
                         enrichedRecord);
 
         Runnable task = createSendTask(producerRecord, producer);
         pool.submit(task);
+    }
+
+    /**
+     * The kafka key is generated based upon all "dimensions" of the eventRecord.
+     * This ensures that all records that should be counted together (statistics-wise), will
+     * end up in the same partition and can be aggregated using kafka-streams.
+     *
+     * @param eventRecord the eventRecord that the key should be based upon.
+     * @return a composite kafkaKey based on all dimensions of the eventRecord.
+     */
+    private String createKafkaKey(EventRecord eventRecord) {
+        Objects.requireNonNull(eventRecord, "EventRecord was null, cannot create a KafkaKey from a null-object.");
+        return eventRecord.getName() + ";" +
+                eventRecord.getApplication() + ";" +
+                eventRecord.getClient() + ";" +
+                eventRecord.getRepresenting() + ";" +
+                eventRecord.getEid() + ";" +
+                eventRecord.getAuthmethod() + ";" +
+                eventRecord.getEnvironment() + ";";
     }
 
     @Override
