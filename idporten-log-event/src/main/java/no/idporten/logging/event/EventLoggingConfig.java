@@ -1,5 +1,6 @@
 package no.idporten.logging.event;
 
+import com.google.common.base.Strings;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.Builder;
@@ -17,9 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 public class EventLoggingConfig {
@@ -155,7 +153,7 @@ public class EventLoggingConfig {
     }
 
     private static String resolveProperty(String key, String userSpecifiedValue, Properties defaultProperties) {
-        if (isEmpty(userSpecifiedValue)) {
+        if (Strings.isNullOrEmpty(userSpecifiedValue)) {
             return Objects.requireNonNull(defaultProperties.getProperty(key), String.format("No default %s found", key));
         } else {
             return userSpecifiedValue;
@@ -169,13 +167,13 @@ public class EventLoggingConfig {
         Map<String, Object> producerConfig = new HashMap<>(propertiesToMap(kafkaProducerProperties));
         producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-        if (!isEmpty(schemaRegistryUsername)) {
+        if (!Strings.isNullOrEmpty((schemaRegistryUsername))) {
             producerConfig.put(
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
                     BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
             producerConfig.put(
                     KafkaAvroSerializerConfig.USER_INFO_CONFIG,
-                    String.format("%s:%s", schemaRegistryUsername, defaultIfEmpty(schemaRegistryPassword, "")));
+                    String.format("%s:%s", schemaRegistryUsername, Strings.nullToEmpty(schemaRegistryPassword)));
         } else {
             producerConfig.put(
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
