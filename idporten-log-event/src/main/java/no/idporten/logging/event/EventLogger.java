@@ -21,6 +21,7 @@ import static no.idporten.logging.event.EventLoggingConfig.FEATURE_ENABLED_KEY;
 
 @Slf4j
 public class EventLogger {
+    private static final String SEPARATOR = ";";
     final ExecutorService pool;
 
     private final EventLoggingConfig config;
@@ -103,13 +104,13 @@ public class EventLogger {
      */
     private String createKafkaKey(EventRecord eventRecord) {
         Objects.requireNonNull(eventRecord, "EventRecord was null, cannot create a KafkaKey from a null-object.");
-        return eventRecord.getName() + ";" +
-                eventRecord.getApplication() + ";" +
-                eventRecord.getClient() + ";" +
-                eventRecord.getRepresenting() + ";" +
-                eventRecord.getEid() + ";" +
-                eventRecord.getAuthmethod() + ";" +
-                eventRecord.getEnvironment() + ";";
+        return eventRecord.getName() + SEPARATOR +
+                eventRecord.getApplication() + SEPARATOR +
+                eventRecord.getClient() + SEPARATOR +
+                eventRecord.getRepresenting() + SEPARATOR +
+                eventRecord.getEid() + SEPARATOR +
+                eventRecord.getAuthmethod() + SEPARATOR +
+                eventRecord.getEnvironment() + SEPARATOR;
     }
 
     @Override
