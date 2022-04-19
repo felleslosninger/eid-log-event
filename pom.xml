@@ -6,7 +6,7 @@
     <artifactId>idporten-log-event-parent</artifactId>
     <groupId>no.idporten.logging</groupId>
     <packaging>pom</packaging>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>DEV-SNAPSHOT</version>
 
     <modules>
         <module>idporten-log-event</module>
@@ -28,7 +28,6 @@
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <maven-release-plugin.version>3.0.0-M5</maven-release-plugin.version>
         <artifactory-maven-plugin.version>3.3.0</artifactory-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>artifactory</project.scm.id>
@@ -161,14 +160,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
-                <configuration>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
             </plugin>
         </plugins>
     </build>

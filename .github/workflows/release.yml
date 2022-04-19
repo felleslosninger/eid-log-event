@@ -1,28 +1,14 @@
-name: Release to GitHub Packages
-
-on: workflow_dispatch
+on:
+  release:
+    types: [created]
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: '8'
-          cache: maven
-          server-id: github
-
-      - name: Configure Git User (for Maven Release)
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-
-      - name: Maven release
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: mvn release:prepare release:perform -U -B -Dusername="${{env.GITHUB_ACTOR}}" -Dpassword="${{env.GITHUB_TOKEN}}"
+  call-workflow-maven-build:
+    uses: felleslosninger/eid-github-workflows/.github/workflows/maven-release-lib.yml@main
+    with:
+      java-version: 8
+    secrets:
+      maven-user: ${{ secrets.MAVEN_USER }}
+      maven-password: ${{ secrets.MAVEN_PASSWORD }}
+      packages-user: ${{ secrets.CREATE_PACKAGES_USER }}
+      packages-token: ${{ secrets.CREATE_PACKAGES_TOKEN }}
