@@ -102,7 +102,7 @@ public class EventLogger {
      * @param eventRecord the eventRecord that the key should be based upon.
      * @return a composite kafkaKey based on all dimensions of the eventRecord.
      */
-    private String createKafkaKey(EventRecord eventRecord) {
+    static String createKafkaKey(EventRecord eventRecord) {
         Objects.requireNonNull(eventRecord, "EventRecord was null, cannot create a KafkaKey from a null-object.");
         return eventRecord.getName() + SEPARATOR +
                 eventRecord.getApplication() + SEPARATOR +
