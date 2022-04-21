@@ -26,7 +26,6 @@ import org.apache.kafka.test.TestCondition;
 import org.apache.kafka.test.TestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Option;
 import scala.jdk.CollectionConverters;
 
 import java.io.IOException;
@@ -268,7 +267,7 @@ public class EmbeddedSingleNodeKafkaCluster {
             final Set<String> allTopicsFromBrokerCache = new HashSet<>(
                     CollectionConverters.SeqHasAsJava(broker.kafkaServer()
                             .metadataCache()
-                            .getAllTopics(Option.empty())
+                            .getAllTopics()
                             .toSeq()).asJava());
 
             return !allTopicsFromZk.removeAll(deletedTopics) && !allTopicsFromBrokerCache.removeAll(deletedTopics);

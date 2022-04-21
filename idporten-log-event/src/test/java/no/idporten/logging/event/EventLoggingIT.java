@@ -9,7 +9,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Integration test using the embedded Kafka cluster by Confluent
  */
-@Disabled("Disabled due to some strange error in embedded kafka test cluster. Will be fixed in another branch")
 class EventLoggingIT {
 
     private static final EmbeddedSingleNodeKafkaCluster cluster = new EmbeddedSingleNodeKafkaCluster();
@@ -106,6 +104,7 @@ class EventLoggingIT {
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
+        consumerProperties.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 
         KafkaConsumer<String, EventRecord> consumer = new KafkaConsumer<>(consumerProperties);
         consumer.subscribe(Collections.singleton(TOPIC));
@@ -121,7 +120,7 @@ class EventLoggingIT {
         long timeout = System.currentTimeMillis() + TEN_SECONDS;
         while (System.currentTimeMillis() < timeout && !received.containsAll(expected)) {
             ConsumerRecords<String, EventRecord> records = consumer.poll(Duration.ofSeconds(1));
-            records.forEach(record -> received.add(record.key()));
+            records.forEach(record -> received.add(record.value().getPid().toString()));
         }
 
         assertTrue(received.containsAll(expected) & expected.containsAll(received));

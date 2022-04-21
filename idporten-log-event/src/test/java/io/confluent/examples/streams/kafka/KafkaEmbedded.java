@@ -27,6 +27,7 @@ import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import org.apache.kafka.common.network.ListenerName;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +86,8 @@ public class KafkaEmbedded {
         effectiveConfig.put(KafkaConfig$.MODULE$.AutoCreateTopicsEnableProp(), true);
         effectiveConfig.put(KafkaConfig$.MODULE$.MessageMaxBytesProp(), 1000000);
         effectiveConfig.put(KafkaConfig$.MODULE$.ControlledShutdownEnableProp(), true);
+        effectiveConfig.put(RemoteLogManagerConfig.REMOTE_STORAGE_MANAGER_CONFIG_PREFIX_PROP, "dummy");
+        effectiveConfig.put(RemoteLogManagerConfig.REMOTE_LOG_METADATA_MANAGER_CONFIG_PREFIX_PROP, "dummy");
 
         effectiveConfig.putAll(initialConfig);
         effectiveConfig.setProperty(KafkaConfig$.MODULE$.LogDirProp(), logDir.getAbsolutePath());
