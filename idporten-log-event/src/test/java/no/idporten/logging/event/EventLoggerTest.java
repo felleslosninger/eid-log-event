@@ -73,10 +73,7 @@ class EventLoggerTest {
         Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        assertEquals(
-                "Innlogget;testApplication;McDuck IT;Andeby kommune;null;OTC;unitTest;",
-                mockProducer.history().get(0).key(),
-                "Record key should be a compositeKey based upon all dimensions of the record");
+        assertNull(mockProducer.history().get(0).key(), "Record key should be null");
     }
 
     @SuppressWarnings("unchecked")

@@ -6,6 +6,9 @@
     <file url="file://$PROJECT_DIR$/idporten-log-event/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/idporten-log-event/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/maskinporten-log-event/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/maskinporten-log-event/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/maskinporten-log-event/target/generated-sources/avro" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
 </project>
