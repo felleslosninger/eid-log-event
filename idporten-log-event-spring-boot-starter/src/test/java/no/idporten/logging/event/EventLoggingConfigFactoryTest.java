@@ -89,12 +89,12 @@ class EventLoggingConfigFactoryTest {
     @Test
     void eventLoggerLogs() {
         EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid("25079494081")
+                .setEventName("Innlogget")
+                .setEventSubjectPid("25079494081")
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setClient("Ansattportalen")
-                .setEid("MinID")
-                .setAuthmethod("OTC")
+                .setServiceProviderId("Ansattportalen")
+                .setAuthEid("MinID")
+                .setAuthMethod("OTC")
                 .build();
 
         eventLogger.log(record);

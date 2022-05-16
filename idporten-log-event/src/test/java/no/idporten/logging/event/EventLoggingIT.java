@@ -58,31 +58,31 @@ class EventLoggingIT {
     void shouldLog() throws Exception {
         final List<EventRecord> inputValues = Arrays.asList(
                 EventRecord.newBuilder()
-                        .setName("Innlogget")
-                        .setDescription("Brukeren har logget inn")
-                        .setPid("24079409630")
+                        .setEventName("Innlogget")
+                        .setEventDescription("Brukeren har logget inn")
+                        .setEventSubjectPid("24079409630")
                         .setCorrelationId(UUID.randomUUID().toString())
-                        .setClient("NAV")
-                        .setEid("Buypass")
-                        .setAuthmethod("PIN")
+                        .setServiceProviderId("NAV")
+                        .setAuthEid("Buypass")
+                        .setAuthMethod("PIN")
                         .build(),
                 EventRecord.newBuilder()
-                        .setName("Utlogget")
-                        .setDescription("Brukeren har logget ut")
-                        .setPid("24079409479")
+                        .setEventName("Utlogget")
+                        .setEventDescription("Brukeren har logget ut")
+                        .setEventSubjectPid("24079409479")
                         .setCorrelationId(UUID.randomUUID().toString())
-                        .setClient("Skatteetaten")
-                        .setEid("BankID")
-                        .setAuthmethod("PIN")
+                        .setServiceProviderId("Skatteetaten")
+                        .setAuthEid("BankID")
+                        .setAuthMethod("PIN")
                         .build(),
                 EventRecord.newBuilder()
-                        .setName("Endret")
-                        .setDescription("Brukeren har endret passordet sitt")
-                        .setPid("24079409398")
+                        .setEventName("Endret")
+                        .setEventDescription("Brukeren har endret passordet sitt")
+                        .setEventSubjectPid("24079409398")
                         .setCorrelationId(UUID.randomUUID().toString())
-                        .setClient("ID-porten")
-                        .setEid("MinID")
-                        .setAuthmethod("App")
+                        .setServiceProviderId("ID-porten")
+                        .setAuthEid("MinID")
+                        .setAuthMethod("App")
                         .build());
 
         EventLoggingConfig config = EventLoggingConfig.builder()
@@ -114,13 +114,13 @@ class EventLoggingIT {
         }
 
         List<String> expected = inputValues.stream()
-                .map(record -> record.getPid().toString())
+                .map(record -> record.getEventSubjectPid().toString())
                 .collect(Collectors.toList());
         List<String> received = new ArrayList<>();
         long timeout = System.currentTimeMillis() + TEN_SECONDS;
         while (System.currentTimeMillis() < timeout && !received.containsAll(expected)) {
             ConsumerRecords<String, EventRecord> records = consumer.poll(Duration.ofSeconds(1));
-            records.forEach(record -> received.add(record.value().getPid().toString()));
+            records.forEach(record -> received.add(record.value().getEventSubjectPid().toString()));
         }
 
         assertTrue(received.containsAll(expected) & expected.containsAll(received));
