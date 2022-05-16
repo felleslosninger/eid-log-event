@@ -57,12 +57,14 @@ Use `EventRecord.newBuilder()` to create an entry to publish:
 import no.idporten.logging.event.EventRecord;
 [...]
         EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid("25079494081")
+                .setEventName("Innlogget")
+                .setEventSubjectPid("25079494081")
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setService("idPorten")
+                .setServiceProviderId("idPorten-123")
+                .setServiceProviderOrgno("123123123")
+                .setServiceOwnerId("idPorten-123")
+                .setServiceOwnerOrgno("123123123")
                 .build();
-
         eventLogger.log(record);
 ```
 
@@ -111,13 +113,16 @@ Simply wire in the Spring Boot-configured `EventLogger`:
 [...]
 ```java
             EventRecord record = EventRecord.newBuilder()
-            .setName("Innlogget")
-            .setPid("25079494081")
+            .setEventName("Innlogget")
+            .setEventSubjectPid("25079494081")
             .setCorrelationId(UUID.randomUUID().toString())
-            .setService("idPorten")
+            .setServiceProviderId("idPorten-123")
+            .setServiceProviderOrgno("123123123")
+            .setServiceOwnerId("idPorten-123")
+            .setServiceOwnerOrgno("123123123")
             .build();
-
-            eventLogger.log(record);
+            
+            eventLogger.log(record);            
 ```
 
 Explore the `no.idporten.logging.event.EventRecord` class for further optional attributes.
