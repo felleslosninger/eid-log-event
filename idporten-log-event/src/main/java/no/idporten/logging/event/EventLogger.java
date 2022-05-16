@@ -53,11 +53,11 @@ public class EventLogger {
 
     private static EventRecord enrichRecord(EventRecord eventRecord, EventLoggingConfig config) {
         return EventRecord.newBuilder(eventRecord)
-                .setApplication(eventRecord.getApplication() == null ?
-                        config.getApplicationName() : eventRecord.getApplication())
-                .setEnvironment(eventRecord.getEnvironment() == null ?
-                        config.getEnvironmentName() : eventRecord.getEnvironment())
-                .setCreated(eventRecord.getCreated() == null ? Instant.now() : eventRecord.getCreated())
+                .setApplicationName(eventRecord.getApplicationName() == null ?
+                        config.getApplicationName() : eventRecord.getApplicationName())
+                .setApplicationEnvironment(eventRecord.getApplicationEnvironment() == null ?
+                        config.getEnvironmentName() : eventRecord.getApplicationEnvironment())
+                .setEventCreatedMs(eventRecord.getEventCreatedMs() == null ? Instant.now() : eventRecord.getEventCreatedMs())
                 .build();
     }
 

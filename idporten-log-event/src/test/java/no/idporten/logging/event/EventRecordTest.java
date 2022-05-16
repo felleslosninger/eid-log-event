@@ -15,13 +15,13 @@ class EventRecordTest {
         String name = "unitTest";
 
         EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid(FNR)
+                .setEventName("Innlogget")
+                .setEventSubjectPid(FNR)
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setApplication(name)
+                .setApplicationName(name)
                 .build();
 
-        assertEquals(name, record.getApplication());
+        assertEquals(name, record.getApplicationName());
     }
 
     @Test
@@ -29,13 +29,13 @@ class EventRecordTest {
         String environment = "unitTest";
 
         EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid(FNR)
+                .setEventName("Innlogget")
+                .setEventSubjectPid(FNR)
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setEnvironment(environment)
+                .setApplicationEnvironment(environment)
                 .build();
 
-        assertEquals(environment, record.getEnvironment());
+        assertEquals(environment, record.getApplicationEnvironment());
     }
 
     @Test
@@ -43,12 +43,12 @@ class EventRecordTest {
         String description = "Brukeren har logget inn";
 
         EventRecord record = EventRecord.newBuilder()
-                .setName("Innlogget")
-                .setPid(FNR)
+                .setEventName("Innlogget")
+                .setEventSubjectPid(FNR)
                 .setCorrelationId(UUID.randomUUID().toString())
-                .setDescription(description)
+                .setEventDescription(description)
                 .build();
 
-        assertEquals(description, record.getDescription());
+        assertEquals(description, record.getEventDescription());
     }
 }

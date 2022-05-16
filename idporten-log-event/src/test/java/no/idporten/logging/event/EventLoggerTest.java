@@ -43,13 +43,14 @@ class EventLoggerTest {
             .build();
 
     private final EventRecord record = EventRecord.newBuilder()
-            .setName("Innlogget")
-            .setDescription("Brukeren har logget inn")
-            .setPid(FNR)
+            .setEventName("Innlogget")
+            .setEventDescription("Brukeren har logget inn")
+            .setEventSubjectPid(FNR)
             .setCorrelationId(UUID.randomUUID().toString())
-            .setClient("McDuck IT")
-            .setRepresenting("Andeby kommune")
-            .setAuthmethod("OTC")
+            .setServiceProviderId("McDuck IT")
+            .setServiceOwnerId("Andeby kommune")
+            .setAuthEid("MinID")
+            .setAuthMethod("OTC")
             .build();
 
     private EventLogger eventLogger;
@@ -119,7 +120,7 @@ class EventLoggerTest {
 
     @Test
     void defaultCreationTimestamp() throws ExecutionException, InterruptedException {
-        assertNull(record.getCreated(), "Test is void: created time set directly on record");
+        assertNull(record.getEventCreatedMs(), "Test is void: created time set directly on record");
 
         eventLogger.log(record);
         eventLogger.producer.flush();
@@ -129,13 +130,13 @@ class EventLoggerTest {
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
         EventRecord loggedRecord = mockProducer.history().get(0).value();
 
-        assertTrue(Instant.now().isAfter(loggedRecord.getCreated()),
+        assertTrue(Instant.now().isAfter(loggedRecord.getEventCreatedMs()),
                 "Creation timestamp should be earlier than current time");
     }
 
     @Test
     void defaultApplicationName() throws ExecutionException, InterruptedException {
-        assertNull(record.getApplication(), "Test is void: application name set directly on record");
+        assertNull(record.getApplicationName(), "Test is void: application name set directly on record");
 
         eventLogger.log(record);
         eventLogger.producer.flush();
@@ -144,12 +145,12 @@ class EventLoggerTest {
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
         EventRecord loggedRecord = mockProducer.history().get(0).value();
-        assertEquals(APPLICATION_NAME, loggedRecord.getApplication(), "Application name not set from config");
+        assertEquals(APPLICATION_NAME, loggedRecord.getApplicationName(), "Application name not set from config");
     }
 
     @Test
     void defaultEnvironmentName() throws ExecutionException, InterruptedException {
-        assertNull(record.getApplication(), "Test is void: environment name set directly on record");
+        assertNull(record.getApplicationName(), "Test is void: environment name set directly on record");
 
         eventLogger.log(record);
         eventLogger.producer.flush();
@@ -158,7 +159,7 @@ class EventLoggerTest {
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
         EventRecord loggedRecord = mockProducer.history().get(0).value();
-        assertEquals(ENVIRONMENT_NAME, loggedRecord.getEnvironment(), "Environment name not set from config");
+        assertEquals(ENVIRONMENT_NAME, loggedRecord.getApplicationEnvironment(), "Environment name not set from config");
     }
 
     @Test
