@@ -1,0 +1,133 @@
+{
+  "namespace": "no.digdir.logging.event",
+  "type": "record",
+  "name": "ActivityRecord",
+  "doc": "Represents an event to log",
+  "fields": [
+    {
+      "name": "event_name",
+      "type": "string",
+      "doc": "Name of the event, typically a type of change"
+    },
+    {
+      "name": "event_created",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null,
+      "doc": "Timestamp for the creation of the event"
+    },
+    {
+      "name": "event_description",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Detailed description of the event"
+    },
+    {
+      "name": "application_name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Name of the application generating the event"
+    },
+    {
+      "name": "application_environment",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Deployment environment the event originates from"
+    },
+    {
+      "name": "event_actor_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Identifier of the person performing"
+    },
+    {
+      "name": "event_subject_pid",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Identifier (pid) of the person impacted"
+    },
+    {
+      "name": "correlation_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Identifier for tracking related events"
+    },
+    {
+      "name": "service_provider_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The id of the service targeted/requested by the event"
+    },
+    {
+      "name": "service_provider_orgno",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The org.no of the service targeted/requested by the event"
+    },
+    {
+      "name": "service_owner_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The identifier of the owner of the provided service"
+    },
+    {
+      "name": "service_owner_orgno",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The org.no of the owner of the provided service"
+    },
+    {
+      "name": "auth_eid",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The electronic identity issuer"
+    },
+    {
+      "name": "auth_method",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The method used to authenticate the identity"
+    }
+  ]
+}

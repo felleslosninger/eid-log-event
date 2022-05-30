@@ -1,0 +1,142 @@
+{
+  "namespace": "no.digdir.logging.event",
+  "type": "record",
+  "name": "MaskinportenAuthentication",
+  "doc": "Represents an authentication from Maskinporten to log",
+  "fields": [
+    {
+      "name": "event_name",
+      "type": "string",
+      "doc": "Name of the event, typically a type of change"
+    },
+    {
+      "name": "event_description",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Detailed description of the event"
+    },
+    {
+      "name": "event_created",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null,
+      "doc": "Timestamp for the creation of the event"
+    },
+    {
+      "name": "application_name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Name of the application generating the event"
+    },
+    {
+      "name": "application_environment",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Deployment environment the event originates from"
+    },
+    {
+      "name": "correlation_id",
+      "type": "string",
+      "doc": "Identifier for tracking related events"
+    },
+    {
+      "name": "client_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Identifier of the client requesting the authentication"
+    },
+    {
+      "name": "client_orgno",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Organization number in ISO6523 format of the client requesting the authentication"
+    },
+    {
+      "name": "client_on_behalf_of_id",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Identifier of the intended client requesting the authentication"
+    },
+    {
+      "name": "certificate_issuer",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Identifier of the certificate issuer"
+    },
+    {
+      "name": "certificate_serial_number",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Serial number of the certificate"
+    },
+    {
+      "name": "kid",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Key identifier"
+    },
+    {
+      "name": "aud",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Audience"
+    },
+    {
+      "name": "token_endpoint_auth_method",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Formerly known as clientAmr"
+    },
+    {
+      "name": "extra_data",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": "string",
+          "default": {}
+        }
+      ],
+      "default": null,
+      "doc": "Additional properties"
+    }
+  ]
+}

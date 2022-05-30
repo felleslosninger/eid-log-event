@@ -1,20 +1,20 @@
 # Event logging
 
-Library for publishing events to a pre-defined Kafka topic.
+Library for publishing events to Kafka.
 
-## idporten-log-event
+## log-event
 Core library with minimal dependencies
 
 ### Build
 
-Pick a [release](https://github.com/felleslosninger/idporten-log-event/releases) 
+Pick a [release](https://github.com/felleslosninger/eid-log-event/releases) 
 and import the library with Maven:
 
 ```xml
     <dependency>
-        <groupId>no.idporten.logging</groupId>
-        <artifactId>idporten-log-event</artifactId>
-        <version>${idporten-event-log.version}</version>
+        <groupId>no.digdir.logging</groupId>
+        <artifactId>log-event</artifactId>
+        <version>${log-event.version}</version>
     </dependency>
 ```
 Since we use libraries from [Confluent](https://confluent.io), you may need to add their repository:
@@ -33,8 +33,8 @@ A Kafka-client needs to find servers and uses a thread-pool to publish events.
 Use `EventLoggingConfig.builder()` to configure the settings:
 
 ```java
-import no.idporten.logging.event.EventLogger;
-import no.idporten.logging.event.EventLoggingConfig;
+import no.digdir.logging.event.EventLogger;
+import no.digdir.logging.event.EventLoggingConfig;
 [...]
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .applicationName(APPLICATION_NAME)
@@ -54,7 +54,7 @@ import no.idporten.logging.event.EventLoggingConfig;
 Use `EventRecord.newBuilder()` to create an entry to publish:
 
 ```java
-import no.idporten.logging.event.EventRecord;
+import no.digdir.logging.event.ActivityRecord;
 [...]
         EventRecord record = EventRecord.newBuilder()
                 .setEventName("Innlogget")
@@ -68,19 +68,19 @@ import no.idporten.logging.event.EventRecord;
         eventLogger.log(record);
 ```
 
-Explore the `no.idporten.logging.event.EventRecord` class for further optional attributes.
+Explore the `no.digdir.logging.event.ActivityRecord` class for further optional attributes.
 The `created`-attribute will default to current time, if not specified.
 
-## idporten-log-event-spring-boot-starter
+## log-event-spring-boot-starter
 Spring Boot Starter for autoconfiguration of the library
 
 ### Build
 Import the library with Maven:
 ```xml
     <dependency>
-        <groupId>no.idporten.logging</groupId>
-        <artifactId>idporten-log-event-spring-boot-starter</artifactId>
-        <version>${idporten-event-log.version}</version>
+        <groupId>no.digdir.logging</groupId>
+        <artifactId>log-event-spring-boot-starter</artifactId>
+        <version>${log-event.version}</version>
     </dependency>
 ```
 ### Configuration
@@ -125,7 +125,7 @@ Simply wire in the Spring Boot-configured `EventLogger`:
             eventLogger.log(record);            
 ```
 
-Explore the `no.idporten.logging.event.EventRecord` class for further optional attributes.
+Explore the `no.digdir.logging.event.ActivityRecord` class for further optional attributes.
 The `created`-attribute will default to current time, if not specified.
 
 ## maskinporten-log-event
@@ -136,7 +136,7 @@ Import the library with Maven:
 
 ```xml
     <dependency>
-        <groupId>no.idporten.logging</groupId>
+        <groupId>no.digdir.logging</groupId>
         <artifactId>maskinporten-log-event</artifactId>
         <version>${maskinporten.log.event.version}</version>
     </dependency>
@@ -166,8 +166,8 @@ spring:
 Use `EventLoggingConfig.builder()` to configure the settings:
 
 ```java
-import no.idporten.logging.event.EventLoggingConfig;
-import no.idporten.logging.event.MaskinportenEventLogger;
+import no.digdir.logging.event.EventLoggingConfig;
+import no.digdir.logging.event.MaskinportenEventLogger;
 [...]
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .applicationName(APPLICATION_NAME)
@@ -187,7 +187,7 @@ import no.idporten.logging.event.MaskinportenEventLogger;
 ### Usage
 Use `MaskinportenEventRecord.newBuilder()` to create an entry to publish:
 ```java
-import no.idporten.logging.event.MaskinportenEventRecord;
+import no.digdir.logging.event.MaskinportenEventRecord;
 [...]
         MaskinportenEventRecord record = MaskinportenEventRecord.newBuilder()
                 .setCorrelationId(correlationId)
@@ -201,10 +201,10 @@ import no.idporten.logging.event.MaskinportenEventRecord;
 ## Feature toggling
 Publishing to Kafka can be disabled by setting the `digdir.event.logging.feature-enabled` property to `false`.
 
-### In idporten-log-event
+### In log-event
 When only the core library is used, the property is set in `event-logger.properties`.
 
-### In idporten-log-event-spring-boot-starter
+### In log-event-spring-boot-starter
 When using the Spring Boot Starter, the property is set in `application.yml`. 
 
 ## Tuning
