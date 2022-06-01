@@ -12,7 +12,7 @@ import java.util.UUID;
         classes = ApplicationTest.class,
         properties = {
                 "digdir.event.logging.feature-enabled=false",
-                "digdir.event.logging.event-topic=aktiviteter"
+                "digdir.event.logging.event-topic=activities"
         }
 )
 @ContextConfiguration(
