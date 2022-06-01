@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=no.idporten.logging.event.EventLoggingConfigFactory

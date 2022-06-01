@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>idporten-log-event-parent</name>
-    <artifactId>idporten-log-event-parent</artifactId>
-    <groupId>no.idporten.logging</groupId>
+    <name>log-event-parent</name>
+    <artifactId>log-event-parent</artifactId>
+    <groupId>no.digdir.logging</groupId>
     <packaging>pom</packaging>
     <version>DEV-SNAPSHOT</version>
 
     <modules>
-        <module>idporten-log-event</module>
-        <module>idporten-log-event-spring-boot-starter</module>
-        <module>maskinporten-log-event</module>
+        <module>log-event</module>
+        <module>log-event-spring-boot-starter</module>
     </modules>
 
     <scm>
-        <connection>scm:git:https://github.com/felleslosninger/idporten-log-event.git</connection>
-        <developerConnection>scm:git:https://github.com/felleslosninger/idporten-log-event.git</developerConnection>
-        <url>https://github.com/felleslosninger/idporten-log-event</url>
+        <connection>scm:git:https://github.com/felleslosninger/eid-log-event.git</connection>
+        <developerConnection>scm:git:https://github.com/felleslosninger/eid-log-event.git</developerConnection>
+        <url>https://github.com/felleslosninger/eid-log-event</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -28,10 +28,7 @@
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <artifactory-maven-plugin.version>3.3.0</artifactory-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.scm.id>artifactory</project.scm.id>
-        <artifactory.url>http://eid-artifactory.dmz.local:8080/artifactory</artifactory.url>
         <kafka.version>3.1.0</kafka.version>
         <confluent.version>7.1.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
@@ -43,6 +40,7 @@
         <mockito.version>4.5.1</mockito.version>
         <log4j2.version>2.17.2</log4j2.version>
         <slf4j.version>1.7.36</slf4j.version>
+        <archunit.version>0.23.1</archunit.version>
         <spring.boot.version>2.7.0</spring.boot.version>
     </properties>
 
@@ -173,12 +171,7 @@
         <repository>
             <id>github</id>
             <name>GitHub felleslosninger Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/felleslosninger/idporten-log-event</url>
-        </repository>
-        <repository>
-            <id>digdir-artifactory</id>
-            <name>libs-release</name>
-            <url>${artifactory.url}/libs-release</url>
+            <url>https://maven.pkg.github.com/felleslosninger/eid-log-event</url>
         </repository>
         <repository>
             <id>Default</id>
@@ -197,7 +190,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/felleslosninger/idporten-log-event</url>
+            <url>https://maven.pkg.github.com/felleslosninger/eid-log-event</url>
         </repository>
     </distributionManagement>
 
