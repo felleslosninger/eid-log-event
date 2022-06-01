@@ -80,21 +80,15 @@ public class MPTokenIssuedRecord extends EventRecordBase {
                 .build();
     }
 
-    static class TokenScope {
+    @Getter
+    public static class TokenScope {
         private final String scope;
         private final String delegationSource;
 
-        TokenScope(String scope, String delegationSource) {
+        @Builder
+        public TokenScope(String scope, String delegationSource) {
             this.scope = scope;
             this.delegationSource = delegationSource;
-        }
-
-        String getScope() {
-            return scope;
-        }
-
-        String getDelegationSource() {
-            return delegationSource;
         }
     }
 }
