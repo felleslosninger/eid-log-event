@@ -2,6 +2,8 @@
 
 Library for publishing events to Kafka.
 
+Can be used with or without Spring. Use [log-event](#log-event) for core library without Spring and [log-event-spring-boot-starter](#log-event-spring-boot-starter) for Spring Autoconfiguration. 
+
 ## log-event
 Core library with minimal dependencies
 
