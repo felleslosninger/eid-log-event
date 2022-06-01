@@ -72,7 +72,7 @@ class EventLoggingConfigFactoryTest {
 
     @Test
     void eventTopicCanBeSetFromYaml() {
-        assertEquals("springEventTopic", eventLoggingConfig.getEventTopic(), "application.yml in test/resources are overriding the default eventTopic with springEventTopic");
+        assertEquals("springEventTopic", eventLoggingConfig.getActivityRecordTopic(), "application.yml in test/resources are overriding the default eventTopic with springEventTopic");
     }
 
     @Test
@@ -88,13 +88,13 @@ class EventLoggingConfigFactoryTest {
 
     @Test
     void eventLoggerLogs() {
-        ActivityRecord record = ActivityRecord.newBuilder()
-                .setEventName("Innlogget")
-                .setEventSubjectPid("25079494081")
-                .setCorrelationId(UUID.randomUUID().toString())
-                .setServiceProviderId("Ansattportalen")
-                .setAuthEid("MinID")
-                .setAuthMethod("OTC")
+        ActivityRecord record = ActivityRecord.builder()
+                .eventName("Innlogget")
+                .eventSubjectPid("25079494081")
+                .correlationId(UUID.randomUUID().toString())
+                .serviceProviderId("Ansattportalen")
+                .authEid("MinID")
+                .authMethod("OTC")
                 .build();
 
         eventLogger.log(record);

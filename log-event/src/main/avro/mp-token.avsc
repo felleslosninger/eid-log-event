@@ -1,7 +1,7 @@
 {
-  "namespace": "no.digdir.logging.event",
+  "namespace": "no.digdir.logging.event.generated",
   "type": "record",
-  "name": "MaskinPortenTokenIssued",
+  "name": "MaskinPortenTokenIssuedAvro",
   "doc": "Represents a token issuance to log",
   "fields": [
     {
@@ -20,14 +20,11 @@
     },
     {
       "name": "event_created",
-      "type": [
-        "null",
+      "type":
         {
           "type": "long",
           "logicalType": "timestamp-millis"
-        }
-      ],
-      "default": null,
+        },
       "doc": "Timestamp for the creation of the event"
     },
     {
@@ -49,24 +46,6 @@
       "doc": "Deployment environment the event originates from"
     },
     {
-      "name": "event_actor_id",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null,
-      "doc": "Identifier of the person performing"
-    },
-    {
-      "name": "event_subject_pid",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null,
-      "doc": "Identifier (pid) of the person impacted"
-    },
-    {
       "name": "correlation_id",
       "type": [
         "null",
@@ -76,7 +55,70 @@
       "doc": "Identifier for tracking related events"
     },
     {
-      "name": "service_provider_id",
+    "name": "client_id",
+    "type": [
+     "null",
+     "string"
+    ],
+    "default": null,
+    "doc": "Identifier of the client requesting the authentication"
+    },
+    {
+    "name": "client_orgno",
+    "type": [
+     "null",
+     "string"
+    ],
+    "default": null,
+    "doc": "Organization number in ISO6523 format of the client requesting the authentication"
+    },
+    {
+    "name": "client_on_behalf_of_id",
+    "type": [
+     "null",
+     "string"
+    ],
+    "default": null,
+    "doc": "Identifier of the intended client requesting the authentication"
+    },
+    {
+      "name": "token_lifetime_seconds",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null,
+      "doc": "Lifetime of the issued token"
+    },
+    {
+      "name": "token_iss",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Issuer of the token"
+    },
+    {
+      "name": "token_scopes",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "TokenScopeAvro",
+            "fields" : [
+              {"name": "scope", "type": "string", "doc": "Name of the scope"},
+              {"name": "delegation_source", "type": ["null", "string"], "doc": "An optional delegation source"}
+            ],
+          "doc": "Scopes of the token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "supplier",
       "type": [
         "null",
         "string"
@@ -85,49 +127,13 @@
       "doc": "The id of the service targeted/requested by the event"
     },
     {
-      "name": "service_provider_orgno",
+      "name": "consumer",
       "type": [
         "null",
         "string"
       ],
       "default": null,
       "doc": "The org.no of the service targeted/requested by the event"
-    },
-    {
-      "name": "service_owner_id",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null,
-      "doc": "The identifier of the owner of the provided service"
-    },
-    {
-      "name": "service_owner_orgno",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null,
-      "doc": "The org.no of the owner of the provided service"
-    },
-    {
-      "name": "auth_eid",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null,
-      "doc": "The electronic identity issuer"
-    },
-    {
-      "name": "auth_method",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null,
-      "doc": "The method used to authenticate the identity"
     },
     {
       "name": "extra_data",

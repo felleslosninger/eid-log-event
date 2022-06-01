@@ -1,7 +1,7 @@
 {
-  "namespace": "no.digdir.logging.event",
+  "namespace": "no.digdir.logging.event.generated",
   "type": "record",
-  "name": "ActivityRecord",
+  "name": "ActivityRecordAvro",
   "doc": "Represents an event to log",
   "fields": [
     {
@@ -11,14 +11,11 @@
     },
     {
       "name": "event_created",
-      "type": [
-        "null",
+      "type":
         {
           "type": "long",
           "logicalType": "timestamp-millis"
-        }
-      ],
-      "default": null,
+        },
       "doc": "Timestamp for the creation of the event"
     },
     {
@@ -128,6 +125,19 @@
       ],
       "default": null,
       "doc": "The method used to authenticate the identity"
+    },
+    {
+      "name": "extra_data",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": "string",
+          "default": {}
+        }
+      ],
+      "default": null,
+      "doc": "Additional properties"
     }
   ]
 }

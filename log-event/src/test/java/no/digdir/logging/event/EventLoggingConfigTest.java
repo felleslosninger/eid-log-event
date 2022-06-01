@@ -5,9 +5,11 @@ import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import static no.digdir.logging.event.EventLoggingConfig.ACTIVITY_RECORD_TOPIC_KEY;
 import static no.digdir.logging.event.EventLoggingConfig.BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO;
 import static no.digdir.logging.event.EventLoggingConfig.ENVIRONMENT_NAME;
-import static no.digdir.logging.event.EventLoggingConfig.EVENT_TOPIC_KEY;
+import static no.digdir.logging.event.EventLoggingConfig.MP_AUTH_RECORD_TOPIC_KEY;
+import static no.digdir.logging.event.EventLoggingConfig.MP_TOKEN_RECORD_TOPIC_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +27,9 @@ class EventLoggingConfigTest {
                 .bootstrapServers("server")
                 .kafkaUsername("franz")
                 .schemaRegistryUrl("registry")
-                .eventTopic("testTopic")
+                .activityRecordTopic("testTopic")
+                .maskinportenAuthenticationRecordTopic("authTopic")
+                .maskinportenTokenRecordTopic("tokenTopic")
                 .build();
 
         assertEquals(
@@ -37,21 +41,63 @@ class EventLoggingConfigTest {
     }
 
     @Test
-    void eventTopicIsSet() {
+    void activityRecordTopicIsSet() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
                 .schemaRegistryUrl("abc")
-                .eventTopic("myFantasticTopic")
+                .activityRecordTopic("activityRecordTopic")
+                .maskinportenAuthenticationRecordTopic("maskinportenAuthenticationRecordTopic")
+                .maskinportenTokenRecordTopic("maskinportenTokenRecordTopic")
                 .build();
 
         assertEquals(
-                "myFantasticTopic", eventLoggingConfig.getEventTopic(),
-                "The eventTopic in the config has not the expected value");
+                "activityRecordTopic", eventLoggingConfig.getActivityRecordTopic(),
+                "The activityRecordTopic in the config has not the expected value");
         assertFalse(eventLoggingConfig.getProducerConfig()
-                .containsKey(EVENT_TOPIC_KEY), "The eventTopic should not be present in the producerConfig");
+                .containsKey(ACTIVITY_RECORD_TOPIC_KEY), "The activityRecordTopic should not be present in the producerConfig");
+    }
+
+    @Test
+    void mpAuthRecordTopicIsSet() {
+        EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
+                .environmentName("unit")
+                .bootstrapServers("abc")
+                .kafkaUsername("abc")
+                .schemaRegistryUrl("abc")
+                .activityRecordTopic("activityRecordTopic")
+                .maskinportenAuthenticationRecordTopic("maskinportenAuthenticationRecordTopic")
+                .maskinportenTokenRecordTopic("maskinportenTokenRecordTopic")
+                .build();
+
+        assertEquals(
+                "maskinportenAuthenticationRecordTopic", eventLoggingConfig.getMaskinportenAuthenticationRecordTopic(),
+                "The maskinportenAuthenticationRecordTopic in the config has not the expected value");
+        assertFalse(eventLoggingConfig.getProducerConfig()
+                .containsKey(MP_AUTH_RECORD_TOPIC_KEY), "The maskinportenAuthenticationRecordTopic should not be present in the producerConfig");
+    }
+
+    @Test
+    void mpTokenRecordTopicIsSet() {
+        EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
+                .environmentName("unit")
+                .bootstrapServers("abc")
+                .kafkaUsername("abc")
+                .schemaRegistryUrl("abc")
+                .activityRecordTopic("activityRecordTopic")
+                .maskinportenAuthenticationRecordTopic("maskinportenAuthenticationRecordTopic")
+                .maskinportenTokenRecordTopic("maskinportenTokenRecordTopic")
+                .build();
+
+        assertEquals(
+                "maskinportenTokenRecordTopic", eventLoggingConfig.getMaskinportenTokenRecordTopic(),
+                "The maskinportenTokenRecordTopic in the config has not the expected value");
+        assertFalse(eventLoggingConfig.getProducerConfig()
+                .containsKey(MP_TOKEN_RECORD_TOPIC_KEY), "The maskinportenTokenRecordTopic should not be present in the producerConfig");
     }
 
     @Test
@@ -64,9 +110,9 @@ class EventLoggingConfigTest {
                 .schemaRegistryUrl("abc")
                 .build();
 
-        assertEquals("aktiviteter", eventLoggingConfig.getEventTopic(), "The eventTopic default value aktiviteter should be there when its not provided in the builder");
+        assertEquals("aktiviteter", eventLoggingConfig.getActivityRecordTopic(), "The eventTopic default value aktiviteter should be there when its not provided in the builder");
         assertFalse(eventLoggingConfig.getProducerConfig()
-                .containsKey(EVENT_TOPIC_KEY), "The eventTopic should not be present in the producerConfig");
+                .containsKey(ACTIVITY_RECORD_TOPIC_KEY), "The eventTopic should not be present in the producerConfig");
     }
 
     @Test

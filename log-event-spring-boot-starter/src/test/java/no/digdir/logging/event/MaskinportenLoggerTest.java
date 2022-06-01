@@ -18,16 +18,15 @@ public class MaskinportenLoggerTest {
 
     @Test
     void logMaskinportenEvent() {
-        MaskinportenEventLogger eventLogger = new MaskinportenEventLogger(eventLoggingConfig);
-        MaskinportenEventRecord record = MaskinportenEventRecord.newBuilder()
-                .setName("Token utstedet")
-                .setCorrelationId(UUID.randomUUID().toString())
-                .setIss("https://maskinporten.no/")
-                .setClientId("test client ID")
-                .setClientAmr("virksomhetssertifikat")
-                .setConsumer("0192:999888777")
-                .setSupplier("0192:777888999")
-                .setScope("lanekassen:lan/v1/saldoopplysninger")
+        EventLogger eventLogger = new EventLogger(eventLoggingConfig);
+        MPAuthenticationRecord record = MPAuthenticationRecord.builder()
+                .eventName("Token utstedet")
+                .correlationId(UUID.randomUUID().toString())
+                .certificateIssuer("https://maskinporten.no/")
+                .clientId("test client ID")
+                .certificateIssuer("0192:999888777")
+                .certificateSerialNumber("0192:777888999")
+                .eventDescription("lanekassen:lan/v1/saldoopplysninger")
                 .build();
 
         eventLogger.log(record);

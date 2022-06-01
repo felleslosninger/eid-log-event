@@ -19,7 +19,9 @@ class EventLoggingConfigurationProperties {
     private final String kafkaPassword;
     private final String schemaRegistryUsername;
     private final String schemaRegistryPassword;
-    private final String eventTopic;
+    private final String activityRecordTopic;
+    private final String maskinportenTokenRecordTopic;
+    private final String maskinportenAuthenticationRecordTopic;
     private final Integer threadPoolSize;
 
     EventLoggingConfigurationProperties(
@@ -31,7 +33,9 @@ class EventLoggingConfigurationProperties {
             String kafkaPassword,
             String schemaRegistryUsername,
             String schemaRegistryPassword,
-            String eventTopic,
+            String activityRecordTopic,
+            String maskinportenTokenRecordTopic,
+            String maskinportenAuthenticationRecordTopic,
             Integer threadPoolSize) {
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
         this.environmentName = environmentName;
@@ -41,7 +45,9 @@ class EventLoggingConfigurationProperties {
         this.kafkaPassword = kafkaPassword;
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
-        this.eventTopic = eventTopic;
+        this.activityRecordTopic = activityRecordTopic;
+        this.maskinportenTokenRecordTopic = maskinportenTokenRecordTopic;
+        this.maskinportenAuthenticationRecordTopic = maskinportenAuthenticationRecordTopic;
         this.threadPoolSize = threadPoolSize;
     }
 }

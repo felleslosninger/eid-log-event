@@ -26,7 +26,9 @@ public class EventLoggingConfig {
     static final String FEATURE_ENABLED_KEY = "digdir.event.logging.feature-enabled";
     static final String APPLICATION_NAME = "application.name";
     static final String ENVIRONMENT_NAME = "environment.name";
-    static final String EVENT_TOPIC_KEY = "event.topic";
+    static final String ACTIVITY_RECORD_TOPIC_KEY = "activity-record.topic";
+    static final String MP_AUTH_RECORD_TOPIC_KEY = "maskinporten-authenticated-record.topic";
+    static final String MP_TOKEN_RECORD_TOPIC_KEY = "maskinporten-token-record.topic";
     static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
 
     private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
@@ -84,10 +86,20 @@ public class EventLoggingConfig {
     private final String schemaRegistryPassword;
 
     /**
-     * Kafka topic to publish to
+     * Kafka topic to publish activityRecords to
      */
     @Getter
-    private final String eventTopic;
+    private final String activityRecordTopic;
+    /**
+     * Kafka topic to publish maskinportenAuthenticatedRecords to
+     */
+    @Getter
+    private final String maskinportenAuthenticationRecordTopic;
+    /**
+     * Kafka topic to publish maskinportenTokenRecords to
+     */
+    @Getter
+    private final String maskinportenTokenRecordTopic;
     /**
      * Number of working threads in the eventLoggerThreadPool.
      */
@@ -107,7 +119,9 @@ public class EventLoggingConfig {
             String kafkaPassword,
             String schemaRegistryUsername,
             String schemaRegistryPassword,
-            String eventTopic,
+            String activityRecordTopic,
+            String maskinportenAuthenticationRecordTopic,
+            String maskinportenTokenRecordTopic,
             Integer threadPoolSize) {
         this.kafkaPassword = kafkaPassword;
         this.schemaRegistryUsername = schemaRegistryUsername;
@@ -120,6 +134,12 @@ public class EventLoggingConfig {
         this.threadPoolSize = Optional.ofNullable(threadPoolSize).orElse(
                 Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_SIZE_KEY)));
 
+        this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
+        this.environmentName = resolveProperty(ENVIRONMENT_NAME, environmentName, eventLoggerDefaultProperties);
+        this.activityRecordTopic = resolveProperty(ACTIVITY_RECORD_TOPIC_KEY, activityRecordTopic, eventLoggerDefaultProperties);
+        this.maskinportenAuthenticationRecordTopic = resolveProperty(MP_AUTH_RECORD_TOPIC_KEY, maskinportenAuthenticationRecordTopic, eventLoggerDefaultProperties);
+        this.maskinportenTokenRecordTopic = resolveProperty(MP_TOKEN_RECORD_TOPIC_KEY, maskinportenTokenRecordTopic, eventLoggerDefaultProperties);
+
         if (this.featureEnabled) {
             this.bootstrapServers = Objects.requireNonNull(bootstrapServers, String.format(
                     NULL_TEMPLATE,
@@ -130,17 +150,11 @@ public class EventLoggingConfig {
             this.kafkaUsername = Objects.requireNonNull(kafkaUsername, String.format(
                     NULL_TEMPLATE,
                     KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-            this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
-            this.environmentName = resolveProperty(ENVIRONMENT_NAME, environmentName, eventLoggerDefaultProperties);
-            this.eventTopic = resolveProperty(EVENT_TOPIC_KEY, eventTopic, eventLoggerDefaultProperties);
             this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
         } else {
-            this.applicationName = null;
-            this.environmentName = null;
             this.bootstrapServers = null;
             this.schemaRegistryUrl = null;
             this.kafkaUsername = null;
-            this.eventTopic = "";
             this.producerConfig = null;
         }
     }

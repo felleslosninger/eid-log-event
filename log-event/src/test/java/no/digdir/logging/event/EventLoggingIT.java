@@ -3,6 +3,7 @@ package no.digdir.logging.event;
 import io.confluent.examples.streams.kafka.EmbeddedSingleNodeKafkaCluster;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import no.digdir.logging.event.generated.ActivityRecordAvro;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -57,32 +58,32 @@ class EventLoggingIT {
     @Test
     void shouldLog() throws Exception {
         final List<ActivityRecord> inputValues = Arrays.asList(
-                ActivityRecord.newBuilder()
-                        .setEventName("Innlogget")
-                        .setEventDescription("Brukeren har logget inn")
-                        .setEventSubjectPid("24079409630")
-                        .setCorrelationId(UUID.randomUUID().toString())
-                        .setServiceProviderId("NAV")
-                        .setAuthEid("Buypass")
-                        .setAuthMethod("PIN")
+                ActivityRecord.builder()
+                        .eventName("Innlogget")
+                        .eventDescription("Brukeren har logget inn")
+                        .eventSubjectPid("24079409630")
+                        .correlationId(UUID.randomUUID().toString())
+                        .serviceProviderId("NAV")
+                        .authEid("Buypass")
+                        .authMethod("PIN")
                         .build(),
-                ActivityRecord.newBuilder()
-                        .setEventName("Utlogget")
-                        .setEventDescription("Brukeren har logget ut")
-                        .setEventSubjectPid("24079409479")
-                        .setCorrelationId(UUID.randomUUID().toString())
-                        .setServiceProviderId("Skatteetaten")
-                        .setAuthEid("BankID")
-                        .setAuthMethod("PIN")
+                ActivityRecord.builder()
+                        .eventName("Utlogget")
+                        .eventDescription("Brukeren har logget ut")
+                        .eventSubjectPid("24079409479")
+                        .correlationId(UUID.randomUUID().toString())
+                        .serviceProviderId("Skatteetaten")
+                        .authEid("BankID")
+                        .authMethod("PIN")
                         .build(),
-                ActivityRecord.newBuilder()
-                        .setEventName("Endret")
-                        .setEventDescription("Brukeren har endret passordet sitt")
-                        .setEventSubjectPid("24079409398")
-                        .setCorrelationId(UUID.randomUUID().toString())
-                        .setServiceProviderId("ID-porten")
-                        .setAuthEid("MinID")
-                        .setAuthMethod("App")
+                ActivityRecord.builder()
+                        .eventName("Endret")
+                        .eventDescription("Brukeren har endret passordet sitt")
+                        .eventSubjectPid("24079409398")
+                        .correlationId(UUID.randomUUID().toString())
+                        .serviceProviderId("ID-porten")
+                        .authEid("MinID")
+                        .authMethod("App")
                         .build());
 
         EventLoggingConfig config = EventLoggingConfig.builder()
@@ -92,7 +93,7 @@ class EventLoggingIT {
                 .schemaRegistryUrl(cluster.schemaRegistryUrl())
                 .kafkaUsername("franz")
                 .kafkaPassword("password")
-                .eventTopic(TOPIC)
+                .activityRecordTopic(TOPIC)
                 .build();
 
         EventLogger eventLogger = new EventLogger(removeSecurityProperty(config));
@@ -106,24 +107,26 @@ class EventLoggingIT {
         consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
         consumerProperties.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 
-        KafkaConsumer<String, ActivityRecord> consumer = new KafkaConsumer<>(consumerProperties);
-        consumer.subscribe(Collections.singleton(TOPIC));
+        try (KafkaConsumer<String, ActivityRecordAvro> consumer = new KafkaConsumer<>(consumerProperties)) {
 
-        for (ActivityRecord inputValue : inputValues) {
-            eventLogger.log(inputValue);
+            consumer.subscribe(Collections.singleton(TOPIC));
+
+            for (ActivityRecord inputValue : inputValues) {
+                eventLogger.log(inputValue);
+            }
+
+            List<String> expected = inputValues.stream()
+                    .map(record -> record.getEventSubjectPid().toString())
+                    .collect(Collectors.toList());
+            List<String> received = new ArrayList<>();
+            long timeout = System.currentTimeMillis() + TEN_SECONDS;
+            while (System.currentTimeMillis() < timeout && !received.containsAll(expected)) {
+                ConsumerRecords<String, ActivityRecordAvro> records = consumer.poll(Duration.ofSeconds(1));
+                records.forEach(record -> received.add(record.value().getEventSubjectPid().toString()));
+            }
+            assertTrue(received.containsAll(expected) & expected.containsAll(received));
         }
 
-        List<String> expected = inputValues.stream()
-                .map(record -> record.getEventSubjectPid().toString())
-                .collect(Collectors.toList());
-        List<String> received = new ArrayList<>();
-        long timeout = System.currentTimeMillis() + TEN_SECONDS;
-        while (System.currentTimeMillis() < timeout && !received.containsAll(expected)) {
-            ConsumerRecords<String, ActivityRecord> records = consumer.poll(Duration.ofSeconds(1));
-            records.forEach(record -> received.add(record.value().getEventSubjectPid().toString()));
-        }
-
-        assertTrue(received.containsAll(expected) & expected.containsAll(received));
     }
 
 

@@ -8,9 +8,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,19 +22,15 @@ public class EventLogger {
     final ExecutorService pool;
 
     private final EventLoggingConfig config;
-    Producer<String, ActivityRecord> activityProducer;
-    Producer<String, MaskinportenAuthentication> mpAuthenticationProducer;
-    Producer<String, MaskinPortenTokenIssued> mpTokenIssuedProducer;
+    Producer<String, SpecificRecordBase> kafkaProducer;
 
     public EventLogger(EventLoggingConfig eventLoggingConfig) {
         this.config = eventLoggingConfig;
-        this.activityProducer = resolveProducer(config);
-        this.mpAuthenticationProducer = resolveProducer(config);
-        this.mpTokenIssuedProducer = resolveProducer(config);
+        this.kafkaProducer = resolveProducer(config);
         this.pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), buildThreadFactory());
     }
 
-    static <T extends SpecificRecordBase> Producer<String, T> resolveProducer(EventLoggingConfig config) {
+    static Producer<String, SpecificRecordBase> resolveProducer(EventLoggingConfig config) {
         if (config.isFeatureEnabled()) {
             return new KafkaProducer<>(config.getProducerConfig());
         } else {
@@ -56,9 +50,9 @@ public class EventLogger {
         };
     }
 
-    static <T extends EventRecordBase> Runnable createSendTask(
-            ProducerRecord<String, T> producerRecord,
-            Producer<String, T> producer) {
+    static Runnable createSendTask(
+            ProducerRecord<String, SpecificRecordBase> producerRecord,
+            Producer<String, SpecificRecordBase> producer) {
 
         return () -> {
             try {
@@ -75,46 +69,15 @@ public class EventLogger {
         };
     }
 
-    private static <T extends EventRecordBase> T enrichRecord(T record, EventLoggingConfig config) {
-        record.setApplicationName(record.getApplicationName() == null ?
-                config.getApplicationName() : record.getApplicationName());
-        record.setApplicationEnvironment(record.getApplicationEnvironment() == null ?
-                config.getEnvironmentName() : record.getApplicationEnvironment());
-        record.setEventCreated(record.getEventCreated() == null ? Instant.now() : record.getEventCreated());
-        return record;
-    }
-
     public void log(EventRecordBase eventRecord) {
-        EventRecordBase enrichedRecord = enrichRecord(eventRecord, config);
-        Runnable task;
-
-        if (eventRecord instanceof ActivityRecord) {
-            ProducerRecord<String, ActivityRecord> producerRecord =
-                    new ProducerRecord<>(config.getEventTopic(), (ActivityRecord) enrichedRecord);
-            task = createSendTask(producerRecord, activityProducer);
-
-        } else if (eventRecord instanceof MaskinportenAuthentication) {
-            ProducerRecord<String, MaskinportenAuthentication> producerRecord =
-                    new ProducerRecord<>(config.getMpAuthenticationTopic(), (MaskinportenAuthentication) enrichedRecord);
-            task = createSendTask(producerRecord, mpAuthenticationProducer);
-
-        } else if (eventRecord instanceof MaskinPortenTokenIssued) {
-            ProducerRecord<String, MaskinPortenTokenIssued> producerRecord =
-                    new ProducerRecord<>(config.getEventTopic(), (MaskinPortenTokenIssued) enrichedRecord);
-            task = createSendTask(producerRecord, mpTokenIssuedProducer);
-
-        } else {
-            throw new IllegalStateException(String.format("Event type not supported: %s", eventRecord.getClass()));
-        }
-
-        pool.submit(task);
+        pool.submit(createSendTask(eventRecord.toProducerRecord(config), kafkaProducer));
     }
 
     @Override
     protected void finalize() {
-        if (activityProducer != null) {
+        if (kafkaProducer != null) {
             try {
-                activityProducer.close();
+                kafkaProducer.close();
             } catch (Exception e) {
                 log.warn("Failed to close Kafka producer", e);
             }
@@ -122,7 +85,7 @@ public class EventLogger {
     }
 
     public Map<MetricName, ? extends Metric> getMetrics() {
-        return activityProducer.metrics();
+        return kafkaProducer.metrics();
     }
 
     public String getPoolQueueStats() {

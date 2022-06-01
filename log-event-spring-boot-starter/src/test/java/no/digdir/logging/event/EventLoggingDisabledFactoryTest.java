@@ -24,13 +24,13 @@ class EventLoggingDisabledFactoryTest {
 
     @Test
     void eventLoggerDisabled() {
-        ActivityRecord record = ActivityRecord.newBuilder()
-                .setEventName("Innlogget")
-                .setEventSubjectPid("25079494081")
-                .setCorrelationId(UUID.randomUUID().toString())
-                .setServiceProviderId("NAV")
-                .setAuthEid("CommFides")
-                .setAuthMethod("PIN")
+        ActivityRecord record = ActivityRecord.builder()
+                .eventName("Innlogget")
+                .eventSubjectPid("25079494081")
+                .correlationId(UUID.randomUUID().toString())
+                .serviceProviderId("NAV")
+                .authEid("CommFides")
+                .authMethod("PIN")
                 .build();
 
         eventLogger.log(record);
