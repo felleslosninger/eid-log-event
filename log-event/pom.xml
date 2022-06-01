@@ -105,9 +105,6 @@
                         <goals>
                             <goal>schema</goal>
                         </goals>
-                        <!--                        <configuration>-->
-                        <!--                            <templateDirectory>src/main/resources/templates/</templateDirectory>-->
-                        <!--                        </configuration>-->
                     </execution>
                 </executions>
             </plugin>
