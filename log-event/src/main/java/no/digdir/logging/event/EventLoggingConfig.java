@@ -133,14 +133,12 @@ public class EventLoggingConfig {
         );
         this.threadPoolSize = Optional.ofNullable(threadPoolSize).orElse(
                 Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_SIZE_KEY)));
-
-        this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
-        this.environmentName = resolveProperty(ENVIRONMENT_NAME, environmentName, eventLoggerDefaultProperties);
-        this.activityRecordTopic = resolveProperty(ACTIVITY_RECORD_TOPIC_KEY, activityRecordTopic, eventLoggerDefaultProperties);
-        this.maskinportenAuthenticationRecordTopic = resolveProperty(MP_AUTH_RECORD_TOPIC_KEY, maskinportenAuthenticationRecordTopic, eventLoggerDefaultProperties);
-        this.maskinportenTokenRecordTopic = resolveProperty(MP_TOKEN_RECORD_TOPIC_KEY, maskinportenTokenRecordTopic, eventLoggerDefaultProperties);
-
         if (this.featureEnabled) {
+            this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
+            this.environmentName = resolveProperty(ENVIRONMENT_NAME, environmentName, eventLoggerDefaultProperties);
+            this.activityRecordTopic = resolveProperty(ACTIVITY_RECORD_TOPIC_KEY, activityRecordTopic, eventLoggerDefaultProperties);
+            this.maskinportenAuthenticationRecordTopic = resolveProperty(MP_AUTH_RECORD_TOPIC_KEY, maskinportenAuthenticationRecordTopic, eventLoggerDefaultProperties);
+            this.maskinportenTokenRecordTopic = resolveProperty(MP_TOKEN_RECORD_TOPIC_KEY, maskinportenTokenRecordTopic, eventLoggerDefaultProperties);
             this.bootstrapServers = Objects.requireNonNull(bootstrapServers, String.format(
                     NULL_TEMPLATE,
                     ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
@@ -156,6 +154,11 @@ public class EventLoggingConfig {
             this.schemaRegistryUrl = null;
             this.kafkaUsername = null;
             this.producerConfig = null;
+            this.applicationName = "N/A";
+            this.environmentName = "N/A";
+            this.activityRecordTopic = "N/A";
+            this.maskinportenAuthenticationRecordTopic = "N/A";
+            this.maskinportenTokenRecordTopic = "N/A";
         }
     }
 
