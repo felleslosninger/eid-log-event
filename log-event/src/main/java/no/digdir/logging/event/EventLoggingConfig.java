@@ -154,11 +154,11 @@ public class EventLoggingConfig {
             this.schemaRegistryUrl = null;
             this.kafkaUsername = null;
             this.producerConfig = null;
-            this.applicationName = "dummy application";
-            this.environmentName = "dummy environment";
-            this.activityRecordTopic = "dummy topic";
-            this.maskinportenAuthenticationRecordTopic = "dummy topic";
-            this.maskinportenTokenRecordTopic = "dummy topic";
+            this.applicationName = "N/A";
+            this.environmentName = "N/A";
+            this.activityRecordTopic = "N/A";
+            this.maskinportenAuthenticationRecordTopic = "N/A";
+            this.maskinportenTokenRecordTopic = "N/A";
         }
     }
 
