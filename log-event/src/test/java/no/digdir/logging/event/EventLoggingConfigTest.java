@@ -110,7 +110,7 @@ class EventLoggingConfigTest {
                 .schemaRegistryUrl("abc")
                 .build();
 
-        assertEquals("activities", eventLoggingConfig.getActivityRecordTopic(), "The eventTopic default value activities should be there when its not provided in the builder");
+        assertEquals("aktiviteter", eventLoggingConfig.getActivityRecordTopic(), "The eventTopic default value activities should be there when its not provided in the builder");
         assertFalse(eventLoggingConfig.getProducerConfig()
                 .containsKey(ACTIVITY_RECORD_TOPIC_KEY), "The eventTopic should not be present in the producerConfig");
     }
