@@ -2,9 +2,10 @@ on: [ push ]
 
 jobs:
   call-workflow-maven-build:
-    uses: felleslosninger/eid-github-workflows/.github/workflows/maven-build-lib.yml@main
+    uses: ./.github/workflows/local-maven-build-lib.yml
     with:
       java-version: 8
+      sbom-path: ./log-event/target/
     secrets:
       maven-user: ${{ secrets.MAVEN_USER }}
       maven-password: ${{ secrets.MAVEN_PASSWORD }}
