@@ -2,7 +2,7 @@ on: [ push ]
 
 jobs:
   call-workflow-maven-build:
-    uses: local-maven-build-lib.yml@main
+    uses: local-maven-build-lib.yml
     with:
       java-version: 8
       sbom-path: ./log-event/target/
