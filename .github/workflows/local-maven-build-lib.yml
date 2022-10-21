@@ -61,4 +61,4 @@ jobs:
         run: mvn -B package
       - uses: anchore/sbom-action@v0
         with:
-          path: ./target/
+          path: ${{ inputs.sbom-path }}
