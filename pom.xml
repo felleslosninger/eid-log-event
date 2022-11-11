@@ -30,10 +30,10 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>3.3.1</kafka.version>
-        <confluent.version>7.2.2</confluent.version>
+        <confluent.version>7.3.0</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
-        <curator.version>5.3.0</curator.version>
-        <jackson.version>2.13.4.2</jackson.version>
+        <curator.version>5.4.0</curator.version>
+        <jackson.version>2.14.0</jackson.version>
         <lombok.version>1.18.24</lombok.version>
         <avro.version>1.11.1</avro.version>
         <junit.version>5.9.1</junit.version>
