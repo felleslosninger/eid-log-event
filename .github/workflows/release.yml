@@ -7,6 +7,7 @@ jobs:
     uses: felleslosninger/eid-github-workflows/.github/workflows/maven-release-lib.yml@main
     with:
       java-version: 8
+      sbom-path: ./log-event/target/
     secrets:
       maven-user: ${{ secrets.MAVEN_USER }}
       maven-password: ${{ secrets.MAVEN_PASSWORD }}
