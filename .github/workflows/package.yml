@@ -4,7 +4,7 @@ jobs:
   call-workflow-maven-build:
     uses: felleslosninger/eid-github-workflows/.github/workflows/maven-build-lib.yml@main
     with:
-      java-version: 8
+      java-version: 17
       sbom-path: ./log-event/target/
     secrets:
       maven-user: ${{ secrets.MAVEN_USER }}
