@@ -299,4 +299,12 @@ class EventLoggingConfigTest {
 
         assertEquals("32601", eventLoggingConfig.getProducerConfig().get("batch.size"));
     }
+
+    @Test
+    void resolveSaslMechanism() {
+        String localUrl = "strimzi-kafka-kafka-bootstrap.event-statistikk.svc.cluster.local:9092";
+        String externalUrl = "kafka.systest.eid-event-stat.no:443";
+        assertEquals("SASL_PLAINTEXT", EventLoggingConfig.resolveSaslMechanism(localUrl, "SASL_SSL"));
+        assertEquals("SASL_SSL", EventLoggingConfig.resolveSaslMechanism(externalUrl, "SASL_SSL"));
+    }
 }
