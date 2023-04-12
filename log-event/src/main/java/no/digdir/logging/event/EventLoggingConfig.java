@@ -31,7 +31,7 @@ public class EventLoggingConfig {
     static final String MP_AUTH_RECORD_TOPIC_KEY = "maskinporten-authenticated-record.topic";
     static final String MP_TOKEN_RECORD_TOPIC_KEY = "maskinporten-token-record.topic";
     static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
-
+    static final String THREAD_POOL_QUEUE_SIZE_KEY = "thread.pool.queue.size";
     private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
     private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.scram.ScramLoginModule " +
@@ -106,6 +106,11 @@ public class EventLoggingConfig {
      */
     @Getter
     private final int threadPoolSize;
+    /**
+     * The queue-capacity of the queue in front of the threadPool
+     */
+    @Getter
+    private final int threadPoolQueueSize;
     @Getter
     private final Map<String, Object> producerConfig;
 
@@ -123,7 +128,8 @@ public class EventLoggingConfig {
             String activityRecordTopic,
             String maskinportenAuthenticationRecordTopic,
             String maskinportenTokenRecordTopic,
-            Integer threadPoolSize) {
+            Integer threadPoolSize,
+            Integer threadPoolQueueSize) {
         this.kafkaPassword = kafkaPassword;
         this.schemaRegistryUsername = schemaRegistryUsername;
         this.schemaRegistryPassword = schemaRegistryPassword;
@@ -134,6 +140,8 @@ public class EventLoggingConfig {
         );
         this.threadPoolSize = Optional.ofNullable(threadPoolSize).orElse(
                 Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_SIZE_KEY)));
+        this.threadPoolQueueSize = Optional.ofNullable(threadPoolQueueSize).orElse(
+                Integer.valueOf(eventLoggerDefaultProperties.getProperty(THREAD_POOL_QUEUE_SIZE_KEY)));
         if (this.featureEnabled) {
             this.applicationName = resolveProperty(APPLICATION_NAME, applicationName, eventLoggerDefaultProperties);
             this.environmentName = resolveProperty(ENVIRONMENT_NAME, environmentName, eventLoggerDefaultProperties);

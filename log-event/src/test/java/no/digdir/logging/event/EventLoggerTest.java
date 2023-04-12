@@ -177,7 +177,7 @@ class EventLoggerTest {
     }
 
     @Test
-    void threadPoolSize() {
+    void threadPoolThreadSize() {
         assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(POOL_SIZE, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(),
                 "PoolSize should have been initialized to " + POOL_SIZE);
@@ -192,9 +192,27 @@ class EventLoggerTest {
                 .threadPoolSize(20)
                 .build();
 
-        eventLogger = new EventLogger(customPoolSizeConfig);
-        assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
-        assertEquals(20, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(), "poolSize should be equal to the new custom set size");
+        var customEventLogger = new EventLogger(customPoolSizeConfig);
+        assertTrue(customEventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
+        assertEquals(20, ((ThreadPoolExecutor) customEventLogger.pool).getCorePoolSize(), "poolSize should be equal to the new custom set size");
+    }
+
+    @Test
+    void threadPoolQueueSize() {
+        EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
+                .applicationName(APPLICATION_NAME)
+                .environmentName(ENVIRONMENT_NAME)
+                .bootstrapServers(DUMMY_URL)
+                .schemaRegistryUrl(DUMMY_URL)
+                .kafkaUsername(USERNAME)
+                .activityRecordTopic("any topic")
+                .featureEnabled(true)
+                .threadPoolQueueSize(200)
+                .build();
+
+        var customEventLogger = new EventLogger(customPoolSizeConfig);
+        assertTrue(customEventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertEquals(200, ((ThreadPoolExecutor) customEventLogger.pool).getQueue().remainingCapacity(), "poolSize remaining capacity should be equal to max capacity since its not in use yet");
     }
 
     @Test
@@ -207,4 +225,6 @@ class EventLoggerTest {
     void metrics() {
         assertNotNull(eventLogger.getMetrics(), "The eventLoggers metrics should be reachable and available.");
     }
+
+
 }
