@@ -231,6 +231,33 @@ class EventLoggingConfigTest {
     }
 
     @Test
+    void threadPoolQueueSize() {
+        EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
+                .environmentName("unit")
+                .bootstrapServers("abc")
+                .schemaRegistryUrl("abc")
+                .kafkaUsername("abc")
+                .featureEnabled(true)
+                .threadPoolQueueSize(200)
+                .build();
+        assertEquals(200, config.getThreadPoolQueueSize(), "ThreadPoolQueueSize should be equal to builder input");
+    }
+
+    @Test
+    void threadPoolQueueSizeDefault() {
+        EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
+                .environmentName("unit")
+                .bootstrapServers("abc")
+                .schemaRegistryUrl("abc")
+                .kafkaUsername("abc")
+                .featureEnabled(true)
+                .build();
+        assertEquals(30000, config.getThreadPoolQueueSize(), "ThreadPoolQueueSize default should be 100000");
+    }
+
+    @Test
     void noSchemaRegistryUsername() {
         EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
                 .applicationName("testApplicationName")

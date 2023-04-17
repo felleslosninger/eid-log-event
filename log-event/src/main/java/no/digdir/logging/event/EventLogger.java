@@ -5,15 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static no.digdir.logging.event.EventLoggingConfig.FEATURE_ENABLED_KEY;
 
@@ -27,7 +27,15 @@ public class EventLogger {
     public EventLogger(EventLoggingConfig eventLoggingConfig) {
         this.config = eventLoggingConfig;
         this.kafkaProducer = resolveProducer(config);
-        this.pool = Executors.newFixedThreadPool(config.getThreadPoolSize(), buildThreadFactory());
+        this.pool = generateFixedThreadPool(config);
+    }
+
+    private ExecutorService generateFixedThreadPool(EventLoggingConfig config) {
+        return new ThreadPoolExecutor(config.getThreadPoolSize(), config.getThreadPoolSize(),
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(config.getThreadPoolQueueSize()),
+                buildThreadFactory(),
+                new DiscardAndLogOldestPolicy());
     }
 
     static Producer<String, SpecificRecordBase> resolveProducer(EventLoggingConfig config) {
@@ -50,27 +58,8 @@ public class EventLogger {
         };
     }
 
-    static Runnable createSendTask(
-            ProducerRecord<String, SpecificRecordBase> producerRecord,
-            Producer<String, SpecificRecordBase> producer) {
-
-        return () -> {
-            try {
-                producer.send(producerRecord, (recordMetadata, e) -> {
-                    if (e != null) {
-                        log.warn("Failed to publish event {}", producerRecord.value(), e);
-                    } else if (log.isTraceEnabled() && recordMetadata != null) {
-                        log.trace("Sent record {} with offset {}", producerRecord, recordMetadata.offset());
-                    }
-                });
-            } catch (Exception e) {
-                log.warn("Failed to publish event {}", producerRecord.value(), e);
-            }
-        };
-    }
-
     public void log(EventRecordBase eventRecord) {
-        pool.submit(createSendTask(eventRecord.toProducerRecord(config), kafkaProducer));
+        pool.submit(new KafkaTask(eventRecord.toProducerRecord(config), kafkaProducer));
     }
 
     @Override
