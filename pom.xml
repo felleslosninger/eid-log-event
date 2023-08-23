@@ -33,7 +33,7 @@
         <confluent.version>7.4.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <curator.version>5.5.0</curator.version>
-        <jackson.version>2.14.2</jackson.version>
+        <jackson.version>2.15.2</jackson.version>
         <lombok.version>1.18.28</lombok.version>
         <avro.version>1.11.2</avro.version>
         <junit.version>5.9.3</junit.version>
