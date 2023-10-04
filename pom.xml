@@ -41,7 +41,7 @@
         <log4j2.version>2.20.0</log4j2.version>
         <slf4j.version>2.0.9</slf4j.version>
         <archunit.version>0.23.1</archunit.version>
-        <spring.boot.version>2.7.15</spring.boot.version>
+        <spring.boot.version>2.7.16</spring.boot.version>
         <snappy.version>1.1.10.3</snappy.version> <!-- CVE-2023-34455 -->
     </properties>
 
