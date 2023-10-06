@@ -120,8 +120,10 @@ class ActivityRecordTest {
                 .correlationId("correlationId")
                 .serviceOwnerId("serviceOwnerId")
                 .serviceOwnerOrgno("serviceOwnerOrgno")
+                .serviceOwnerName("serviceOwnerName")
                 .serviceProviderId("serviceProviderId")
                 .serviceProviderOrgno("serviceProviderOrgno")
+                .serviceProviderName("serviceProviderName")
                 .extraData(Collections.singletonMap("key", "value"))
                 .eventCreated(Instant.now().minus(Duration.ofSeconds(60)))
                 .build();
@@ -142,9 +144,11 @@ class ActivityRecordTest {
         assertEquals(record.getAuthEid(), avroRecord.getAuthEid());
         assertEquals(record.getAuthMethod(), avroRecord.getAuthMethod());
         assertEquals(record.getServiceOwnerOrgno(), avroRecord.getServiceOwnerOrgno());
+        assertEquals(record.getServiceOwnerName(), avroRecord.getServiceOwnerName());
         assertEquals(record.getServiceOwnerId(), avroRecord.getServiceOwnerId());
         assertEquals(record.getServiceProviderId(), avroRecord.getServiceProviderId());
         assertEquals(record.getServiceProviderOrgno(), avroRecord.getServiceProviderOrgno());
+        assertEquals(record.getServiceProviderName(), avroRecord.getServiceProviderName());
         assertEquals(record.getEventSubjectPid(), avroRecord.getEventSubjectPid());
         assertEquals(record.getCorrelationId(), avroRecord.getCorrelationId());
         assertEquals(record.getExtraData(), avroRecord.getExtraData());
