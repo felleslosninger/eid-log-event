@@ -16,8 +16,10 @@ public class ActivityRecord extends EventRecordBase {
     private final String eventSubjectPid;
     private final String serviceProviderId;
     private final String serviceProviderOrgno;
+    private final String serviceProviderName;
     private final String serviceOwnerId;
     private final String serviceOwnerOrgno;
+    private final String serviceOwnerName;
     private final String authEid;
     private final String authMethod;
 
@@ -31,8 +33,10 @@ public class ActivityRecord extends EventRecordBase {
             String eventSubjectPid,
             String serviceProviderId,
             String serviceProviderOrgno,
+            String serviceProviderName,
             String serviceOwnerId,
             String serviceOwnerOrgno,
+            String serviceOwnerName,
             String authEid,
             String authMethod,
             Instant eventCreated) {
@@ -41,8 +45,10 @@ public class ActivityRecord extends EventRecordBase {
         this.eventSubjectPid = eventSubjectPid;
         this.serviceProviderId = serviceProviderId;
         this.serviceProviderOrgno = serviceProviderOrgno;
+        this.serviceProviderName = serviceProviderName;
         this.serviceOwnerId = serviceOwnerId;
         this.serviceOwnerOrgno = serviceOwnerOrgno;
+        this.serviceOwnerName = serviceOwnerName;
         this.authEid = authEid;
         this.authMethod = authMethod;
     }
@@ -64,8 +70,10 @@ public class ActivityRecord extends EventRecordBase {
                 .setEventSubjectPid(eventSubjectPid)
                 .setServiceProviderId(serviceProviderId)
                 .setServiceProviderOrgno(serviceProviderOrgno)
+                .setServiceProviderName(serviceProviderName)
                 .setServiceOwnerId(serviceOwnerId)
                 .setServiceOwnerOrgno(serviceOwnerOrgno)
+                .setServiceOwnerName(serviceOwnerName)
                 .setAuthEid(authEid)
                 .setAuthMethod(authMethod)
                 .build();

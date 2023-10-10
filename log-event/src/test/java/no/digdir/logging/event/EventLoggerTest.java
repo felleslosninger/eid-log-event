@@ -225,4 +225,6 @@ class EventLoggerTest {
     void metrics() {
         assertNotNull(eventLogger.getMetrics(), "The eventLoggers metrics should be reachable and available.");
     }
+
+
 }

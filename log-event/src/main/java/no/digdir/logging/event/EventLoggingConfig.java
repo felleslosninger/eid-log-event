@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -31,7 +32,6 @@ public class EventLoggingConfig {
     static final String MP_TOKEN_RECORD_TOPIC_KEY = "maskinporten-token-record.topic";
     static final String THREAD_POOL_SIZE_KEY = "thread.pool.size";
     static final String THREAD_POOL_QUEUE_SIZE_KEY = "thread.pool.queue.size";
-
     private static final String PRODUCER_PROPERTIES_FILE_PATH = "kafka-producer.properties";
     private static final String EVENT_LOGGER_PROPERTIES_FILE_PATH = "event-logger.properties";
     private static final String JAAS_CONFIG_TEMPLATE = "org.apache.kafka.common.security.scram.ScramLoginModule " +
@@ -186,12 +186,36 @@ public class EventLoggingConfig {
         }
     }
 
+
+    /**
+     * https://github.com/felleslosninger/eid-log-event/issues/174
+     *
+     * @param bootstrapServers URL to Kafka
+     * @param configured       value
+     * @return SASL mechanism appropriate for external or internal URL
+     */
+    static String resolveSaslMechanism(String bootstrapServers, String configured) {
+        if (bootstrapServers.contains("local")) {
+            if (!SecurityProtocol.SASL_PLAINTEXT.name().equals(configured)) {
+                log.info(
+                        "{} overridden with value {}",
+                        SaslConfigs.SASL_MECHANISM, SecurityProtocol.SASL_PLAINTEXT.name());
+            }
+            return SecurityProtocol.SASL_PLAINTEXT.name();
+        } else {
+            return configured;
+        }
+    }
+
     private Map<String, Object> createProducerConfig() {
         Properties kafkaProducerProperties = loadPropertiesFromFile(PRODUCER_PROPERTIES_FILE_PATH);
         kafkaProducerProperties =
                 overrideWithOptionalConfig(kafkaProducerProperties, CUSTOM_PRODUCER_PROPERTIES_FILE_PATH);
         Map<String, Object> producerConfig = new HashMap<>(propertiesToMap(kafkaProducerProperties));
         producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        producerConfig.put(SaslConfigs.SASL_MECHANISM, resolveSaslMechanism(
+                bootstrapServers,
+                kafkaProducerProperties.getProperty(SaslConfigs.SASL_MECHANISM)));
         producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
         if (!Strings.isNullOrEmpty((schemaRegistryUsername))) {
             producerConfig.put(

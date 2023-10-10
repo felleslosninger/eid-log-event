@@ -64,8 +64,10 @@ import no.digdir.logging.event.ActivityRecord;
                 .setCorrelationId(UUID.randomUUID().toString())
                 .setServiceProviderId("idPorten-123")
                 .setServiceProviderOrgno("123123123")
+                .setServiceProviderName("Provider AS")
                 .setServiceOwnerId("idPorten-123")
                 .setServiceOwnerOrgno("123123123")
+                .setServiceOwnerName("Owner Inc.")
                 .build();
         eventLogger.log(record);
 ```
@@ -125,8 +127,10 @@ Currently we support three different types of records: ActivityRecord, MPAuthent
             .setCorrelationId(UUID.randomUUID().toString())
             .setServiceProviderId("idPorten-123")
             .setServiceProviderOrgno("123123123")
+            .setServiceProviderName("Provider AS")
             .setServiceOwnerId("idPorten-123")
             .setServiceOwnerOrgno("123123123")
+            .setServiceOwnerName("Owner Inc.")
             .build();
             
             eventLogger.log(record);            
