@@ -91,6 +91,15 @@
       "doc": "The org.no of the service targeted/requested by the event"
     },
     {
+      "name": "service_provider_name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The humanly readable name of the service targeted/requested by the event"
+    },
+    {
       "name": "service_owner_id",
       "type": [
         "null",
@@ -107,6 +116,15 @@
       ],
       "default": null,
       "doc": "The org.no of the owner of the provided service"
+    },
+    {
+      "name": "service_owner_name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "The humanly readable name of the owner of the provided service"
     },
     {
       "name": "auth_eid",
