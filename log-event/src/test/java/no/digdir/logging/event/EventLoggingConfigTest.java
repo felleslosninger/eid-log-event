@@ -218,19 +218,6 @@ class EventLoggingConfigTest {
     }
 
     @Test
-    void threadPoolSizeDefault() {
-        EventLoggingConfig config = EventLoggingConfig.builder()
-                .applicationName("testApplicationName")
-                .environmentName("unit")
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .kafkaUsername("abc")
-                .featureEnabled(true)
-                .build();
-        assertEquals(4, config.getThreadPoolSize(), "ThreadPoolSize default should be 4");
-    }
-
-    @Test
     void threadPoolQueueSize() {
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .applicationName("testApplicationName")
@@ -255,6 +242,19 @@ class EventLoggingConfigTest {
                 .featureEnabled(true)
                 .build();
         assertEquals(30000, config.getThreadPoolQueueSize(), "ThreadPoolQueueSize default should be 100000");
+    }
+
+    @Test
+    void threadPoolSizeDefault() {
+        EventLoggingConfig config = EventLoggingConfig.builder()
+                .applicationName("testApplicationName")
+                .environmentName("unit")
+                .bootstrapServers("abc")
+                .schemaRegistryUrl("abc")
+                .kafkaUsername("abc")
+                .featureEnabled(true)
+                .build();
+        assertEquals(4, config.getThreadPoolSize(), "ThreadPoolSize default should be 4");
     }
 
     @Test
@@ -325,5 +325,13 @@ class EventLoggingConfigTest {
                 .build();
 
         assertEquals("32601", eventLoggingConfig.getProducerConfig().get("batch.size"));
+    }
+
+    @Test
+    void resolveSaslMechanism() {
+        String localUrl = "strimzi-kafka-kafka-bootstrap.event-statistikk.svc.cluster.local:9092";
+        String externalUrl = "kafka.systest.eid-event-stat.no:443";
+        assertEquals("SASL_PLAINTEXT", EventLoggingConfig.resolveSaslMechanism(localUrl, "SASL_SSL"));
+        assertEquals("SASL_SSL", EventLoggingConfig.resolveSaslMechanism(externalUrl, "SASL_SSL"));
     }
 }

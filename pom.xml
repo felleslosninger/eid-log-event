@@ -25,23 +25,24 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kafka.version>3.3.1</kafka.version>
-        <confluent.version>7.3.1</confluent.version>
+        <kafka.version>3.4.0</kafka.version>
+        <confluent.version>7.5.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
-        <curator.version>5.4.0</curator.version>
-        <jackson.version>2.14.1</jackson.version>
-        <lombok.version>1.18.24</lombok.version>
-        <avro.version>1.11.1</avro.version>
-        <junit.version>5.9.1</junit.version>
-        <mockito.version>4.11.0</mockito.version>
-        <log4j2.version>2.19.0</log4j2.version>
-        <slf4j.version>2.0.6</slf4j.version>
+        <curator.version>5.5.0</curator.version>
+        <jackson.version>2.15.2</jackson.version>
+        <lombok.version>1.18.30</lombok.version>
+        <avro.version>1.11.3</avro.version>
+        <junit.version>5.10.0</junit.version>
+        <mockito.version>5.6.0</mockito.version>
+        <log4j2.version>2.20.0</log4j2.version>
+        <slf4j.version>2.0.9</slf4j.version>
         <archunit.version>0.23.1</archunit.version>
-        <spring.boot.version>2.7.5</spring.boot.version>
+        <spring.boot.version>2.7.16</spring.boot.version>
+        <snappy.version>1.1.10.5</snappy.version> <!-- CVE-2023-34455 -->
     </properties>
 
     <dependencyManagement>
@@ -66,6 +67,7 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -132,9 +134,11 @@
                 <version>${curator.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
