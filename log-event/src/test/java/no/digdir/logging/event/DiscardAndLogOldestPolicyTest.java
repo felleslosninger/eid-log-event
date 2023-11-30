@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,7 +29,7 @@ class DiscardAndLogOldestPolicyTest {
     private final Producer<String, SpecificRecordBase> kafkaProducer = new KafkaProducer<>(config.getProducerConfig());
 
     @Test
-    void testOldestIsDescheduled() {
+    void testOldestIsUnscheduled() {
         KafkaTask oldKafkaTask = createKafkaTask("OldEvent");
         when(executor.getQueue()).thenReturn(queue);
         when(queue.poll()).thenReturn(oldKafkaTask);
@@ -38,7 +37,7 @@ class DiscardAndLogOldestPolicyTest {
         KafkaTask newKafkaTask = createKafkaTask("NewEvent");
 
         discardAndLogOldestPolicy.rejectedExecution(newKafkaTask, executor);
-        verify(executor).execute(eq(newKafkaTask));
+        verify(executor).execute(newKafkaTask);
         verify(queue).poll();
     }
 

@@ -4,9 +4,8 @@ import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import no.digdir.logging.event.generated.ActivityRecordAvro;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.MockProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,16 +14,18 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 class EventLoggerTest {
 
@@ -55,7 +56,9 @@ class EventLoggerTest {
             .authMethod("OTC")
             .build();
 
-    private EventLogger eventLogger;
+    private DefaultEventLogger eventLogger;
+    private MockProducer<String, SpecificRecordBase> kafkaProducer;
+    private ExecutorService executorService;
 
     @BeforeEach
     void setUp() {
@@ -63,20 +66,19 @@ class EventLoggerTest {
         SpecificAvroSerde<SpecificRecordBase> serde = new SpecificAvroSerde<>(schemaRegistryClient);
         serde.configure(config.getProducerConfig(), false);
 
-        eventLogger = new EventLogger(config);
-        eventLogger.kafkaProducer.close();
-        eventLogger.kafkaProducer = new MockProducer<>(true, new StringSerializer(), serde.serializer());
+        kafkaProducer = spy(new MockProducer<>(true, new StringSerializer(), serde.serializer()));
+        executorService = new EventLoggerThreadPoolExecutor(config);
+        eventLogger = new DefaultEventLogger(config, kafkaProducer, executorService);
     }
 
     @Test
     void log() throws ExecutionException, InterruptedException {
         eventLogger.log(record);
-        eventLogger.kafkaProducer.flush();
-        MockProducer<String, SpecificRecordBase> mockProducer = (MockProducer<String, SpecificRecordBase>) eventLogger.kafkaProducer;
-        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+        kafkaProducer.flush();
+        Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        assertNull(mockProducer.history().get(0).key(), "Record key should be null");
+        assertNull(kafkaProducer.history().get(0).key(), "Record key should be null");
     }
 
     @Test
@@ -91,52 +93,27 @@ class EventLoggerTest {
                 .build();
 
         eventLogger.log(record);
-        eventLogger.kafkaProducer.flush();
-        MockProducer<String, SpecificRecordBase> mockProducer = (MockProducer<String, SpecificRecordBase>) eventLogger.kafkaProducer;
-        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+        kafkaProducer.flush();
+        Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        assertNull(mockProducer.history().get(0).key(), "Record key should be null");
+        assertNull(kafkaProducer.history().get(0).key(), "Record key should be null");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void logWhenFailure() {
-        Producer<String, SpecificRecordBase> producerMock = mock(Producer.class);
-        when(producerMock.send(any(ProducerRecord.class)))
-                .thenThrow(new KafkaException("Simulating Kafka down"));
-        eventLogger.kafkaProducer = producerMock;
-
-        eventLogger.log(record);
-    }
-
-    @Test
-    void noLoggingWhenDisabled() {
-        EventLoggingConfig disablingConfig = EventLoggingConfig.builder()
-                .applicationName(APPLICATION_NAME)
-                .environmentName(ENVIRONMENT_NAME)
-                .bootstrapServers(DUMMY_URL)
-                .schemaRegistryUrl(DUMMY_URL)
-                .kafkaUsername(USERNAME)
-                .activityRecordTopic("any topic")
-                .featureEnabled(false)
-                .build();
-
-        eventLogger = new EventLogger(disablingConfig);
-        eventLogger.log(record);
-        eventLogger.kafkaProducer.flush();
-        assertTrue(eventLogger.kafkaProducer instanceof NoLoggingProducer, "Logger should be non-logging");
+        doThrow(new KafkaException("Simulating Kafka down")).when(kafkaProducer).send(any(), any(Callback.class));
+        assertDoesNotThrow(() -> eventLogger.log(record));
     }
 
     @Test
     void defaultCreationTimestamp() throws ExecutionException, InterruptedException {
         eventLogger.log(record);
-        eventLogger.kafkaProducer.flush();
-        MockProducer<String, SpecificRecordBase> mockProducer = (MockProducer<String, SpecificRecordBase>) eventLogger.kafkaProducer;
-        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+        kafkaProducer.flush();
+        Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) mockProducer.history().get(0).value();
+        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) kafkaProducer.history().get(0).value();
 
         assertTrue(Instant.now().isAfter(loggedRecord.getEventCreated()),
                 "Creation timestamp should be earlier than current time");
@@ -147,12 +124,11 @@ class EventLoggerTest {
         assertNull(record.getApplicationName(), "Test is void: application name set directly on record");
 
         eventLogger.log(record);
-        eventLogger.kafkaProducer.flush();
-        MockProducer<String, SpecificRecordBase> mockProducer = (MockProducer<String, SpecificRecordBase>) eventLogger.kafkaProducer;
-        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+        kafkaProducer.flush();
+        Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) mockProducer.history().get(0).value();
+        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) kafkaProducer.history().get(0).value();
         assertEquals(APPLICATION_NAME, loggedRecord.getApplicationName(), "Application name not set from config");
     }
 
@@ -161,25 +137,24 @@ class EventLoggerTest {
         assertNull(record.getApplicationName(), "Test is void: environment name set directly on record");
 
         eventLogger.log(record);
-        eventLogger.kafkaProducer.flush();
-        MockProducer<String, SpecificRecordBase> mockProducer = (MockProducer<String, SpecificRecordBase>) eventLogger.kafkaProducer;
-        Future<Integer> sentEventsFuture = eventLogger.pool.submit(() -> mockProducer.history().size());
+        kafkaProducer.flush();
+        Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) mockProducer.history().get(0).value();
+        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) kafkaProducer.history().get(0).value();
         assertEquals(ENVIRONMENT_NAME, loggedRecord.getApplicationEnvironment(), "Environment name not set from config");
     }
 
     @Test
     void silentFailing() {
-        eventLogger.finalize(); // producer is closed
-        eventLogger.log(record);
+        eventLogger.preDestroy(); // producer is closed
+        assertDoesNotThrow(() -> eventLogger.log(record));
     }
 
     @Test
     void threadPoolThreadSize() {
-        assertTrue(eventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
-        assertEquals(POOL_SIZE, ((ThreadPoolExecutor) eventLogger.pool).getCorePoolSize(),
+        assertTrue(executorService instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertEquals(POOL_SIZE, ((ThreadPoolExecutor) executorService).getCorePoolSize(),
                 "PoolSize should have been initialized to " + POOL_SIZE);
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
                 .applicationName(APPLICATION_NAME)
@@ -192,9 +167,9 @@ class EventLoggerTest {
                 .threadPoolSize(20)
                 .build();
 
-        var customEventLogger = new EventLogger(customPoolSizeConfig);
-        assertTrue(customEventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
-        assertEquals(20, ((ThreadPoolExecutor) customEventLogger.pool).getCorePoolSize(), "poolSize should be equal to the new custom set size");
+        var customEventLogger = new DefaultEventLogger(customPoolSizeConfig);
+        assertTrue(customEventLogger.getExecutorService() instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
+        assertEquals(20, ((ThreadPoolExecutor) customEventLogger.getExecutorService()).getCorePoolSize(), "poolSize should be equal to the new custom set size");
     }
 
     @Test
@@ -210,21 +185,14 @@ class EventLoggerTest {
                 .threadPoolQueueSize(200)
                 .build();
 
-        var customEventLogger = new EventLogger(customPoolSizeConfig);
-        assertTrue(customEventLogger.pool instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
-        assertEquals(200, ((ThreadPoolExecutor) customEventLogger.pool).getQueue().remainingCapacity(), "poolSize remaining capacity should be equal to max capacity since its not in use yet");
-    }
-
-    @Test
-    void queueStats() {
-        assertTrue(eventLogger.getPoolQueueStats().contains("ThreadPoolSize:"),
-                "\"ThreadPoolSize:\" is the first part of the queueStats when the stats are displayed as they should.");
+        var customEventLogger = new DefaultEventLogger(customPoolSizeConfig);
+        assertTrue(customEventLogger.getExecutorService() instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertEquals(200, ((ThreadPoolExecutor) customEventLogger.getExecutorService()).getQueue()
+                .remainingCapacity(), "poolSize remaining capacity should be equal to max capacity since its not in use yet");
     }
 
     @Test
     void metrics() {
         assertNotNull(eventLogger.getMetrics(), "The eventLoggers metrics should be reachable and available.");
     }
-
-
 }
