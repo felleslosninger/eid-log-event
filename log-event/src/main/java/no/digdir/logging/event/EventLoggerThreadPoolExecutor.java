@@ -7,9 +7,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class EventLoggerThreadPoolExecutor extends ThreadPoolExecutor {
+class EventLoggerThreadPoolExecutor extends ThreadPoolExecutor {
 
-    public EventLoggerThreadPoolExecutor(EventLoggingConfig config) {
+    EventLoggerThreadPoolExecutor(EventLoggingConfig config) {
         super(config.getThreadPoolSize(), config.getThreadPoolSize(),
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(config.getThreadPoolQueueSize()),

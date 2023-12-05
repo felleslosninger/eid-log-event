@@ -1,12 +1,6 @@
 # IntelliJ
 out/
 target/
-*.iml
-
-.idea/encodings.xml
-.idea/php.xml
-.idea/misc.xml
-.idea/jpa-buddy.xml
 
 # User-specific stuff
 .idea/**/workspace.xml

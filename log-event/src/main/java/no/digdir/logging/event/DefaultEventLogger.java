@@ -35,7 +35,7 @@ public class DefaultEventLogger implements EventLogger {
     }
 
     @PreDestroy
-    public void preDestroy() {
+    void preDestroy() {
         if (kafkaProducer != null) {
             try {
                 kafkaProducer.close();

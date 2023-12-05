@@ -29,7 +29,7 @@ class DiscardAndLogOldestPolicyTest {
     private final Producer<String, SpecificRecordBase> kafkaProducer = new KafkaProducer<>(config.getProducerConfig());
 
     @Test
-    void testOldestIsUnscheduled() {
+    void testOldestIsDescheduled() {
         KafkaTask oldKafkaTask = createKafkaTask("OldEvent");
         when(executor.getQueue()).thenReturn(queue);
         when(queue.poll()).thenReturn(oldKafkaTask);

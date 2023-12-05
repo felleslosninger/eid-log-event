@@ -1,10 +1,13 @@
 package no.digdir.logging.event;
 
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.UUID;
 
 import static no.digdir.logging.event.EventLoggingConfig.BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,6 +28,9 @@ class EventLoggingConfigFactoryTest {
     EventLogger eventLogger;
     @Autowired
     private EventLoggingConfig eventLoggingConfig;
+    @Autowired
+    @Qualifier("eventLoggerProducer")
+    Producer<String, SpecificRecordBase> eventLoggerProducer;
 
     @Test
     void applicationNameSetFromYaml() {
@@ -98,5 +105,7 @@ class EventLoggingConfigFactoryTest {
                 .build();
 
         eventLogger.log(record);
+
+        assertThat(eventLoggerProducer).isInstanceOf(EventLoggerKafkaProducer.class);
     }
 }
