@@ -106,6 +106,7 @@ class EventLoggingConfigFactoryTest {
 
         eventLogger.log(record);
 
+        assertThat(eventLogger).isInstanceOf(DefaultEventLogger.class);
         assertThat(eventLoggerProducer).isInstanceOf(EventLoggerKafkaProducer.class);
     }
 }
