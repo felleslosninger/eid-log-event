@@ -14,13 +14,13 @@ import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @RequiredArgsConstructor
-public class DefaultEventLogger implements EventLogger {
+class DefaultEventLogger implements EventLogger {
     private final EventLoggingConfig config;
     private final Producer<String, SpecificRecordBase> kafkaProducer;
     @Getter
     private final ExecutorService executorService;
 
-    public DefaultEventLogger(EventLoggingConfig config) {
+    DefaultEventLogger(EventLoggingConfig config) {
         this(config, new EventLoggerKafkaProducer(config), new EventLoggerThreadPoolExecutor(config));
     }
 
