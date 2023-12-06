@@ -2,7 +2,6 @@ package no.digdir.logging.event;
 
 import com.google.common.base.Strings;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -153,10 +152,10 @@ public class EventLoggingConfig {
                     ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
             this.schemaRegistryUrl = Objects.requireNonNull(schemaRegistryUrl, String.format(
                     NULL_TEMPLATE,
-                    KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG));
+                    AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG));
             this.kafkaUsername = Objects.requireNonNull(kafkaUsername, String.format(
                     NULL_TEMPLATE,
-                    KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
+                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
             this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
         } else {
             this.bootstrapServers = null;
@@ -188,7 +187,7 @@ public class EventLoggingConfig {
 
 
     /**
-     * https://github.com/felleslosninger/eid-log-event/issues/174
+     * <a href="https://github.com/felleslosninger/eid-log-event/issues/174">...</a>
      *
      * @param bootstrapServers URL to Kafka
      * @param configured       value
@@ -216,17 +215,17 @@ public class EventLoggingConfig {
         producerConfig.put(SaslConfigs.SASL_MECHANISM, resolveSaslMechanism(
                 bootstrapServers,
                 kafkaProducerProperties.getProperty(SaslConfigs.SASL_MECHANISM)));
-        producerConfig.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+        producerConfig.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
         if (!Strings.isNullOrEmpty((schemaRegistryUsername))) {
             producerConfig.put(
-                    KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
+                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
                     BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
             producerConfig.put(
-                    KafkaAvroSerializerConfig.USER_INFO_CONFIG,
+                    AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG,
                     String.format("%s:%s", schemaRegistryUsername, Strings.nullToEmpty(schemaRegistryPassword)));
         } else {
             producerConfig.put(
-                    KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
+                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
                     AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT);
         }
         producerConfig.put(

@@ -12,13 +12,12 @@ import java.util.UUID;
 @ContextConfiguration(
         classes = EventLoggingConfigFactory.class,
         initializers = ConfigDataApplicationContextInitializer.class)
-public class MaskinportenLoggerTest {
+class MaskinportenLoggerTest {
     @Autowired
-    private EventLoggingConfig eventLoggingConfig;
+    private EventLogger eventLogger;
 
     @Test
     void logMaskinportenEvent() {
-        EventLogger eventLogger = new EventLogger(eventLoggingConfig);
         MPAuthenticationRecord record = MPAuthenticationRecord.builder()
                 .eventName("Token utstedet")
                 .correlationId(UUID.randomUUID().toString())

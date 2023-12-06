@@ -96,7 +96,7 @@ class EventLoggingIT {
                 .activityRecordTopic(TOPIC)
                 .build();
 
-        EventLogger eventLogger = new EventLogger(removeSecurityProperty(config));
+        EventLogger eventLogger = new DefaultEventLogger(removeSecurityProperty(config));
 
         final Properties consumerProperties = new Properties();
         consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.bootstrapServers());
@@ -116,8 +116,8 @@ class EventLoggingIT {
             }
 
             List<String> expected = inputValues.stream()
-                    .map(record -> record.getEventSubjectPid().toString())
-                    .collect(Collectors.toList());
+                    .map(ActivityRecord::getEventSubjectPid)
+                    .toList();
             List<String> received = new ArrayList<>();
             long timeout = System.currentTimeMillis() + TEN_SECONDS;
             while (System.currentTimeMillis() < timeout && !received.containsAll(expected)) {

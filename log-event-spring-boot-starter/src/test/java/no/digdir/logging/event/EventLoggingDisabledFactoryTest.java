@@ -8,6 +8,8 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest(
         classes = ApplicationTest.class,
         properties = {
@@ -34,6 +36,8 @@ class EventLoggingDisabledFactoryTest {
                 .build();
 
         eventLogger.log(record);
+
+        assertThat(eventLogger).isInstanceOf(NoLoggingEventLogger.class);
     }
 
 }
