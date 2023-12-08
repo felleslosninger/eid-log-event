@@ -19,6 +19,7 @@ import static no.digdir.logging.event.EventLoggingConfig.FEATURE_ENABLED_KEY;
 @AutoConfiguration
 class EventLoggingConfigFactory {
 
+    @AutoConfiguration
     @ConditionalOnProperty(prefix = "digdir.event.logging", name = "feature-enabled", havingValue = "true", matchIfMissing = true)
     @EnableConfigurationProperties(EventLoggingConfigurationProperties.class)
     public static class Enabled {
