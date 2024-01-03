@@ -27,19 +27,19 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
         <build-helper-maven-plugin>3.5.0</build-helper-maven-plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>3.5.0</kafka.version>
         <confluent.version>7.5.2</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <curator.version>5.5.0</curator.version>
-        <jackson.version>2.16.0</jackson.version>
+        <jackson.version>2.16.1</jackson.version>
         <lombok.version>1.18.30</lombok.version>
         <avro.version>1.11.3</avro.version>
         <junit.version>5.10.1</junit.version>
         <mockito.version>5.8.0</mockito.version>
-        <log4j2.version>2.22.0</log4j2.version>
+        <log4j2.version>2.22.1</log4j2.version>
         <slf4j.version>2.0.10</slf4j.version>
         <archunit.version>0.23.1</archunit.version>
         <spring.boot.version>2.7.18</spring.boot.version>
