@@ -26,21 +26,21 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
-        <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
-        <build-helper-maven-plugin>3.5.0</build-helper-maven-plugin>
+        <maven-failsafe-plugin.version>3.3.1</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
+        <build-helper-maven-plugin>3.6.0</build-helper-maven-plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>3.6.0</kafka.version>
         <confluent.version>7.6.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <curator.version>5.6.0</curator.version>
         <jackson.version>2.17.2</jackson.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <avro.version>1.11.3</avro.version>
         <junit.version>5.10.2</junit.version>
-        <mockito.version>5.10.0</mockito.version>
-        <log4j2.version>2.22.1</log4j2.version>
-        <slf4j.version>2.0.12</slf4j.version>
+        <mockito.version>5.12.0</mockito.version>
+        <log4j2.version>2.23.1</log4j2.version>
+        <slf4j.version>2.0.13</slf4j.version>
         <archunit.version>0.23.1</archunit.version>
         <spring.boot.version>2.7.18</spring.boot.version>
         <snappy.version>1.1.10.5</snappy.version> <!-- CVE-2023-34455 -->
