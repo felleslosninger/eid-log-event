@@ -31,7 +31,7 @@
         <build-helper-maven-plugin>3.6.0</build-helper-maven-plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>3.7.0</kafka.version>
-        <confluent.version>7.6.1</confluent.version>
+        <confluent.version>7.7.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <curator.version>5.7.0</curator.version>
         <jackson.version>2.18.0</jackson.version>
