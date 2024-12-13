@@ -1,15 +1,15 @@
+name: Release to github packages
+
 on:
   release:
     types: [created]
 
 jobs:
-  call-workflow-maven-build:
-    uses: felleslosninger/eid-github-workflows/.github/workflows/maven-release-lib.yml@main
+  call-workflow-maven-deploy:
+    uses: felleslosninger/github-workflows/.github/workflows/ci-maven-deploy.yml@main
     with:
       java-version: 17
       sbom-path: ./log-event/target/
-    secrets:
-      maven-user: ${{ secrets.MAVEN_USER }}
-      maven-password: ${{ secrets.MAVEN_PASSWORD }}
-      packages-user: ${{ secrets.CREATE_PACKAGES_USER }}
-      packages-token: ${{ secrets.CREATE_PACKAGES_TOKEN }}
+      package-version: ${{ github.event.release.tag_name }}
+      deployment-repository: ${{ github.repository }}
+    secrets: inherit
