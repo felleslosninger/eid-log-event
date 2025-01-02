@@ -17,7 +17,6 @@ package io.confluent.examples.streams.kafka;
 
 import kafka.cluster.EndPoint;
 import kafka.server.KafkaConfig;
-import kafka.server.KafkaConfig$;
 import kafka.server.KafkaServer;
 import kafka.utils.TestUtils;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -27,13 +26,16 @@ import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import org.apache.kafka.common.network.ListenerName;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig;
+import org.apache.kafka.network.SocketServerConfigs;
+import org.apache.kafka.server.config.ServerConfigs;
+import org.apache.kafka.server.config.ServerLogConfigs;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -57,6 +59,8 @@ public class KafkaEmbedded {
     private final Properties effectiveConfig;
     private final File logDir;
     private final KafkaServer kafka;
+    @TempDir
+    private Path tmpFolder;
 
     /**
      * Creates and starts an embedded Kafka broker.
@@ -66,7 +70,7 @@ public class KafkaEmbedded {
      *               `log.dirs`, `port`.
      */
     public KafkaEmbedded(final Properties config) throws IOException {
-        logDir = Files.createTempDirectory("log").toFile();
+        logDir = tmpFolder.toFile();
         effectiveConfig = effectiveConfigFrom(config);
         final boolean loggingEnabled = true;
 
@@ -80,17 +84,15 @@ public class KafkaEmbedded {
 
     private Properties effectiveConfigFrom(final Properties initialConfig) {
         final Properties effectiveConfig = new Properties();
-        effectiveConfig.put(KafkaConfig$.MODULE$.BrokerIdProp(), 0);
-        effectiveConfig.put(KafkaConfig.ListenersProp(), "PLAINTEXT://127.0.0.1:9092");
-        effectiveConfig.put(KafkaConfig$.MODULE$.NumPartitionsProp(), 1);
-        effectiveConfig.put(KafkaConfig$.MODULE$.AutoCreateTopicsEnableProp(), true);
-        effectiveConfig.put(KafkaConfig$.MODULE$.MessageMaxBytesProp(), 1000000);
-        effectiveConfig.put(KafkaConfig$.MODULE$.ControlledShutdownEnableProp(), true);
-        effectiveConfig.put(RemoteLogManagerConfig.REMOTE_STORAGE_MANAGER_CONFIG_PREFIX_PROP, "dummy");
-        effectiveConfig.put(RemoteLogManagerConfig.REMOTE_LOG_METADATA_MANAGER_CONFIG_PREFIX_PROP, "dummy");
+        effectiveConfig.put(ServerConfigs.BROKER_ID_CONFIG, 0);
+        effectiveConfig.put(SocketServerConfigs.LISTENERS_CONFIG, "PLAINTEXT://127.0.0.1:9092");
+        effectiveConfig.put(ServerLogConfigs.NUM_PARTITIONS_CONFIG, 1);
+        effectiveConfig.put(ServerLogConfigs.AUTO_CREATE_TOPICS_ENABLE_CONFIG, true);
+        effectiveConfig.put(ServerConfigs.MESSAGE_MAX_BYTES_CONFIG, 1000000);
+        effectiveConfig.put(ServerConfigs.CONTROLLED_SHUTDOWN_ENABLE_CONFIG, true);
 
         effectiveConfig.putAll(initialConfig);
-        effectiveConfig.setProperty(KafkaConfig$.MODULE$.LogDirProp(), logDir.getAbsolutePath());
+        effectiveConfig.setProperty(ServerLogConfigs.LOG_DIR_CONFIG, logDir.getAbsolutePath());
         return effectiveConfig;
     }
 
@@ -124,8 +126,6 @@ public class KafkaEmbedded {
                 brokerList(), zookeeperConnect());
         kafka.shutdown();
         kafka.awaitShutdown();
-        boolean deleted = logDir.delete();
-        log.debug("Temporary files deleted: {}", deleted);
         log.debug("Shutdown of embedded Kafka broker at {} completed (with ZK ensemble at {}) ...",
                 brokerList(), zookeeperConnect());
     }
