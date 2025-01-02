@@ -29,13 +29,12 @@ import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.network.SocketServerConfigs;
 import org.apache.kafka.server.config.ServerConfigs;
 import org.apache.kafka.server.config.ServerLogConfigs;
-import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -59,8 +58,6 @@ public class KafkaEmbedded {
     private final Properties effectiveConfig;
     private final File logDir;
     private final KafkaServer kafka;
-    @TempDir
-    private Path tmpFolder;
 
     /**
      * Creates and starts an embedded Kafka broker.
@@ -70,7 +67,7 @@ public class KafkaEmbedded {
      *               `log.dirs`, `port`.
      */
     public KafkaEmbedded(final Properties config) throws IOException {
-        logDir = tmpFolder.toFile();
+        logDir = Files.createTempDirectory("log").toFile();
         effectiveConfig = effectiveConfigFrom(config);
         final boolean loggingEnabled = true;
 
@@ -126,6 +123,8 @@ public class KafkaEmbedded {
                 brokerList(), zookeeperConnect());
         kafka.shutdown();
         kafka.awaitShutdown();
+        boolean deleted = logDir.delete();
+        log.debug("Temporary files deleted: {}", deleted);
         log.debug("Shutdown of embedded Kafka broker at {} completed (with ZK ensemble at {}) ...",
                 brokerList(), zookeeperConnect());
     }
