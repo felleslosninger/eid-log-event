@@ -1,11 +1,14 @@
-on: [ push ]
+name: Maven build
+
+on:
+  push:
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   call-workflow-maven-build:
-    uses: felleslosninger/eid-github-workflows/.github/workflows/maven-build-lib.yml@main
+    uses: felleslosninger/github-workflows/.github/workflows/ci-maven-build-lib.yml@main
     with:
       java-version: 17
       sbom-path: ./log-event/target/
-    secrets:
-      maven-user: ${{ secrets.MAVEN_USER }}
-      maven-password: ${{ secrets.MAVEN_PASSWORD }}
+    secrets: inherit
