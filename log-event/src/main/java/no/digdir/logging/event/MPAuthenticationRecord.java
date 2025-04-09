@@ -20,6 +20,7 @@ public class MPAuthenticationRecord extends EventRecordBase {
     private final String kid;
     private final String aud;
     private final String tokenEndpointAuthMethod;
+    private final String consumerOrgno;
 
     @Builder
     public MPAuthenticationRecord(
@@ -35,6 +36,7 @@ public class MPAuthenticationRecord extends EventRecordBase {
             String kid,
             String aud,
             String tokenEndpointAuthMethod,
+            String consumerOrgno,
             Instant eventCreated) {
         super(eventName, eventDescription, correlationId, extraData, eventCreated);
         this.clientId = clientId;
@@ -45,6 +47,7 @@ public class MPAuthenticationRecord extends EventRecordBase {
         this.kid = kid;
         this.aud = aud;
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
+        this.consumerOrgno = consumerOrgno;
     }
 
     @Override
@@ -67,6 +70,7 @@ public class MPAuthenticationRecord extends EventRecordBase {
                 .setKid(kid)
                 .setAud(aud)
                 .setTokenEndpointAuthMethod(tokenEndpointAuthMethod)
+                .setConsumerOrgno(consumerOrgno)
                 .build();
     }
 }

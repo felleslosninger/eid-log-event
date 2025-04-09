@@ -123,6 +123,14 @@
       "doc": "Formerly known as clientAmr"
     },
     {
+      "name": "consumer_orgno",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Organization number of the consumer"
+    },    {
       "name": "extra_data",
       "type": [
         "null",
