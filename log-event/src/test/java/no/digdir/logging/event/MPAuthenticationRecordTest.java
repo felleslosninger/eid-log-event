@@ -31,7 +31,7 @@ class MPAuthenticationRecordTest {
                 .kid("kid")
                 .aud("aud")
                 .tokenEndpointAuthMethod("TokenEndpointAuthMethod")
-                .consumerOrgno("consumerOrgno")
+                .consumer("consumer")
                 .build();
 
         EventLoggingConfig config = EventLoggingConfig.builder()
@@ -65,7 +65,7 @@ class MPAuthenticationRecordTest {
                 .kid("kid")
                 .aud("aud")
                 .tokenEndpointAuthMethod("TokenEndpointAuthMethod")
-                .consumerOrgno("consumerOrgno")
+                .consumer("consumer")
                 .build();
 
         EventLoggingConfig config = EventLoggingConfig.builder()
@@ -89,7 +89,7 @@ class MPAuthenticationRecordTest {
         assertEquals(record.getKid(), avroRecord.getKid());
         assertEquals(record.getAud(), avroRecord.getAud());
         assertEquals(record.getTokenEndpointAuthMethod(), avroRecord.getTokenEndpointAuthMethod());
-        assertEquals(record.getConsumerOrgno(), avroRecord.getConsumerOrgno());
+        assertEquals(record.getConsumer(), avroRecord.getConsumer());
         assertEquals(record.getCorrelationId(), avroRecord.getCorrelationId());
         assertEquals(record.getExtraData(), avroRecord.getExtraData());
         assertEquals(record.getEventCreated().toEpochMilli(), avroRecord.getEventCreated().toEpochMilli());
