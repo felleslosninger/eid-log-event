@@ -31,18 +31,20 @@
         <build-helper-maven-plugin>3.6.0</build-helper-maven-plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>3.8.0</kafka.version>
-        <confluent.version>7.9.0</confluent.version>
+        <confluent.version>7.9.1</confluent.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <curator.version>5.8.0</curator.version>
         <jackson.version>2.19.0</jackson.version>
         <lombok.version>1.18.38</lombok.version>
         <avro.version>1.12.0</avro.version>
-        <junit.version>5.12.1</junit.version>
+        <junit.version>5.12.2</junit.version>
         <mockito.version>5.17.0</mockito.version>
         <log4j2.version>2.24.3</log4j2.version>
         <slf4j.version>2.0.17</slf4j.version>
         <archunit.version>0.23.1</archunit.version>
         <spring.boot.version>2.7.18</spring.boot.version>
+        <testcontainers.version>1.21.0</testcontainers.version>
+        <commons.lang3.version>3.17.0</commons.lang3.version>
         <snappy.version>1.1.10.7</snappy.version> <!-- CVE-2023-34455 -->
     </properties>
 
@@ -171,6 +173,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <confluent.version>${confluent.version}</confluent.version>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>
