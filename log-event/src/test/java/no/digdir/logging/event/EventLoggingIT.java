@@ -1,6 +1,5 @@
 package no.digdir.logging.event;
 
-import io.confluent.examples.streams.kafka.EmbeddedSingleNodeKafkaCluster;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import no.digdir.logging.event.generated.ActivityRecordAvro;
@@ -11,11 +10,14 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.utility.DockerImageName;
 
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,24 +27,49 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Integration test using the embedded Kafka cluster by Confluent
- */
 class EventLoggingIT {
 
-    private static final EmbeddedSingleNodeKafkaCluster cluster = new EmbeddedSingleNodeKafkaCluster();
     private static final String TOPIC = "aktiviteter";
-    private static final long TEN_SECONDS = 10000L;
+    private static final long TEN_SECONDS = 10_000L;
+
+    private static KafkaContainer kafkaContainer;
+    private static GenericContainer<?> schemaRegistryContainer;
+    private static String schemaRegistryUrl;
 
     @BeforeAll
-    static void beforeAll() throws Exception {
-        cluster.start();
-        cluster.createTopic(TOPIC);
+    static void setUp() {
+        Network network = Network.newNetwork();
+
+        String kafkaVersion = System.getProperty("confluent.version", "7.9.1"); // set in pom.xml
+        kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")
+                .withTag(kafkaVersion))
+                .withNetwork(network)
+                .withNetworkAliases("kafka")
+                .withEnv("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true");
+        kafkaContainer.start();
+
+        schemaRegistryContainer = new GenericContainer<>(DockerImageName.parse("confluentinc/cp-schema-registry")
+                .withTag(kafkaVersion))
+                .withNetwork(network)
+                .withNetworkAliases("schema-registry")
+                .withEnv("SCHEMA_REGISTRY_HOST_NAME", "schema-registry")
+                .withEnv("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS", "PLAINTEXT://kafka:9092")
+                .withExposedPorts(8081);
+        schemaRegistryContainer.start();
+
+        String host = schemaRegistryContainer.getHost();
+        Integer port = schemaRegistryContainer.getMappedPort(8081);
+        schemaRegistryUrl = "http://" + host + ":" + port;
     }
 
     @AfterAll
-    static void afterAll() {
-        cluster.stop();
+    static void tearDown() {
+        if (schemaRegistryContainer != null) {
+            schemaRegistryContainer.stop();
+        }
+        if (kafkaContainer != null) {
+            kafkaContainer.stop();
+        }
     }
 
     private static EventLoggingConfig removeSecurityProperty(EventLoggingConfig config) throws NoSuchFieldException, IllegalAccessException {
@@ -57,7 +84,7 @@ class EventLoggingIT {
 
     @Test
     void shouldLog() throws Exception {
-        final List<ActivityRecord> inputValues = Arrays.asList(
+        final List<ActivityRecord> inputValues = List.of(
                 ActivityRecord.builder()
                         .eventName("Innlogget")
                         .eventDescription("Brukeren har logget inn")
@@ -84,23 +111,24 @@ class EventLoggingIT {
                         .serviceProviderId("ID-porten")
                         .authEid("MinID")
                         .authMethod("App")
-                        .build());
+                        .build()
+        );
 
         EventLoggingConfig config = EventLoggingConfig.builder()
                 .applicationName("integrationTest")
-                .environmentName("embedded")
-                .bootstrapServers(cluster.bootstrapServers())
-                .schemaRegistryUrl(cluster.schemaRegistryUrl())
-                .kafkaUsername("franz")
-                .kafkaPassword("password")
+                .environmentName("testcontainers")
+                .bootstrapServers(kafkaContainer.getBootstrapServers())
+                .schemaRegistryUrl(schemaRegistryUrl)
+                .kafkaUsername("testuser")
+                .kafkaPassword("testpassword")
                 .activityRecordTopic(TOPIC)
                 .build();
 
         EventLogger eventLogger = new DefaultEventLogger(removeSecurityProperty(config));
 
         final Properties consumerProperties = new Properties();
-        consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.bootstrapServers());
-        consumerProperties.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, cluster.schemaRegistryUrl());
+        consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        consumerProperties.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, TOPIC + "-consumer");
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -124,10 +152,7 @@ class EventLoggingIT {
                 ConsumerRecords<String, ActivityRecordAvro> records = consumer.poll(Duration.ofSeconds(1));
                 records.forEach(record -> received.add(record.value().getEventSubjectPid().toString()));
             }
-            assertTrue(received.containsAll(expected) & expected.containsAll(received));
+            assertTrue(received.containsAll(expected) && expected.containsAll(received));
         }
-
     }
-
-
 }
