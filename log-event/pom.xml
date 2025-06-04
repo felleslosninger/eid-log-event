@@ -64,17 +64,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${kafka.scala.version}</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${kafka.scala.version}</artifactId>
-            <classifier>test</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
             <classifier>test</classifier>
@@ -90,17 +79,6 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-raft</artifactId>
             <version>${kafka.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-schema-registry</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-schema-registry</artifactId>
-            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
