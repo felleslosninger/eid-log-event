@@ -6,6 +6,8 @@ import no.digdir.logging.event.generated.ActivityRecordAvro;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.MockProducer;
+import org.apache.kafka.clients.producer.Partitioner;
+import org.apache.kafka.common.Cluster;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,7 +58,27 @@ class EventLoggerTest {
             .authEid("MinID")
             .authMethod("OTC")
             .build();
+    private final Partitioner partitioner = new Partitioner() {
 
+        @Override
+        public int partition(
+                String topic,
+                Object key,
+                byte[] keyBytes,
+                Object value,
+                byte[] valueBytes,
+                Cluster cluster) {
+            return 0; // Always assign to partition 0
+        }
+
+        @Override
+        public void close() {
+        }
+
+        @Override
+        public void configure(java.util.Map<String, ?> configs) {
+        }
+    };
     private DefaultEventLogger eventLogger;
     private MockProducer<String, SpecificRecordBase> kafkaProducer;
     private ExecutorService executorService;
@@ -66,7 +89,7 @@ class EventLoggerTest {
         SpecificAvroSerde<SpecificRecordBase> serde = new SpecificAvroSerde<>(schemaRegistryClient);
         serde.configure(config.getProducerConfig(), false);
 
-        kafkaProducer = spy(new MockProducer<>(true, new StringSerializer(), serde.serializer()));
+        kafkaProducer = spy(new MockProducer<>(true, partitioner, new StringSerializer(), serde.serializer()));
         executorService = new EventLoggerThreadPoolExecutor(config);
         eventLogger = new DefaultEventLogger(config, kafkaProducer, executorService);
     }
@@ -153,7 +176,7 @@ class EventLoggerTest {
 
     @Test
     void threadPoolThreadSize() {
-        assertTrue(executorService instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertInstanceOf(ThreadPoolExecutor.class, executorService, "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(POOL_SIZE, ((ThreadPoolExecutor) executorService).getCorePoolSize(),
                 "PoolSize should have been initialized to " + POOL_SIZE);
         EventLoggingConfig customPoolSizeConfig = EventLoggingConfig.builder()
@@ -168,7 +191,7 @@ class EventLoggerTest {
                 .build();
 
         var customEventLogger = new DefaultEventLogger(customPoolSizeConfig);
-        assertTrue(customEventLogger.getExecutorService() instanceof ThreadPoolExecutor, "The threadPool should still be of type ThreadPoolExecutor");
+        assertInstanceOf(ThreadPoolExecutor.class, customEventLogger.getExecutorService(), "The threadPool should still be of type ThreadPoolExecutor");
         assertEquals(20, ((ThreadPoolExecutor) customEventLogger.getExecutorService()).getCorePoolSize(), "poolSize should be equal to the new custom set size");
     }
 
@@ -186,7 +209,7 @@ class EventLoggerTest {
                 .build();
 
         var customEventLogger = new DefaultEventLogger(customPoolSizeConfig);
-        assertTrue(customEventLogger.getExecutorService() instanceof ThreadPoolExecutor, "The threadPool should be of type ThreadPoolExecutor");
+        assertInstanceOf(ThreadPoolExecutor.class, customEventLogger.getExecutorService(), "The threadPool should be of type ThreadPoolExecutor");
         assertEquals(200, ((ThreadPoolExecutor) customEventLogger.getExecutorService()).getQueue()
                 .remainingCapacity(), "poolSize remaining capacity should be equal to max capacity since its not in use yet");
     }
