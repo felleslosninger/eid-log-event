@@ -42,7 +42,7 @@
         <archunit.version>0.23.1</archunit.version>
         <spring.boot.version>2.7.18</spring.boot.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <commons.lang3.version>3.17.0</commons.lang3.version>
+        <commons.lang3.version>3.18.0</commons.lang3.version>
         <snakeyaml.version>2.4</snakeyaml.version> <!-- CVE-2022-25857 -->
     </properties>
 
