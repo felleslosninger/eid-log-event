@@ -6,8 +6,13 @@ import no.digdir.logging.event.generated.ActivityRecordAvro;
 import org.apache.avro.specific.SpecificRecordBase;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static no.digdir.logging.event.DateUtil.computeDOB;
 
 @Getter
 public class ActivityRecord extends EventRecordBase {
@@ -22,6 +27,8 @@ public class ActivityRecord extends EventRecordBase {
     private final String serviceOwnerName;
     private final String authEid;
     private final String authMethod;
+    private final Integer subjectBirthYear;
+    private final Integer subjectAgeAtEvent;
 
     @Builder
     public ActivityRecord(
@@ -39,6 +46,8 @@ public class ActivityRecord extends EventRecordBase {
             String serviceOwnerName,
             String authEid,
             String authMethod,
+            Integer subjectBirthyear,
+            Integer subjectAgeAtEvent,
             Instant eventCreated) {
         super(eventName, eventDescription, correlationId, extraData, eventCreated);
         this.eventActorId = eventActorId;
@@ -51,12 +60,14 @@ public class ActivityRecord extends EventRecordBase {
         this.serviceOwnerName = serviceOwnerName;
         this.authEid = authEid;
         this.authMethod = authMethod;
+        this.subjectBirthYear = subjectBirthyear;
+        this.subjectAgeAtEvent = subjectAgeAtEvent;
     }
 
 
     @Override
     protected SpecificRecordBase toAvroObject() {
-        return ActivityRecordAvro.newBuilder()
+        ActivityRecordAvro.Builder recordBuilder = ActivityRecordAvro.newBuilder()
                 .setEventName(getEventName())
                 .setEventDescription(getEventDescription())
                 .setEventCreated(getEventCreated())
@@ -75,7 +86,19 @@ public class ActivityRecord extends EventRecordBase {
                 .setServiceOwnerOrgno(serviceOwnerOrgno)
                 .setServiceOwnerName(serviceOwnerName)
                 .setAuthEid(authEid)
-                .setAuthMethod(authMethod)
-                .build();
+                .setAuthMethod(authMethod);
+
+        if (subjectBirthYear == null && subjectAgeAtEvent == null && eventSubjectPid != null ) {
+            LocalDate dateOfBirth = computeDOB(eventSubjectPid);
+            if (dateOfBirth != null) {
+                recordBuilder.setSubjectBirthyear(dateOfBirth.getYear());
+                recordBuilder.setSubjectAgeAtEvent(
+                        Period.between(dateOfBirth, getEventCreated().atZone(ZoneId.systemDefault())
+                        .toLocalDate()).getYears());
+            }
+        }
+
+        return recordBuilder.build();
     }
+
 }
