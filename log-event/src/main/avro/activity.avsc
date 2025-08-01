@@ -156,6 +156,18 @@
       ],
       "default": null,
       "doc": "Additional properties"
+    },
+    {
+      "name": "subject_birthyear",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "4-digit year of birth of the subject"
+    },
+    {
+      "name": "subject_age_at_event",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Age in years of the subject"
     }
   ]
 }
