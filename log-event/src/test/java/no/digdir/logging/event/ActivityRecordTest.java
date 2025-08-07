@@ -7,11 +7,13 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class ActivityRecordTest {
 
@@ -40,7 +42,7 @@ class ActivityRecordTest {
 
         ProducerRecord<String, SpecificRecordBase> result = record.toProducerRecord(config);
         assertEquals(topicName, result.topic());
-        assertTrue(result.value() instanceof ActivityRecordAvro);
+        assertInstanceOf(ActivityRecordAvro.class, result.value());
         ActivityRecordAvro activityRecordAvro = (ActivityRecordAvro) result.value();
         assertEquals(applicationName, activityRecordAvro.getApplicationName());
         assertEquals(applicationEnvironment, activityRecordAvro.getApplicationEnvironment());
@@ -64,7 +66,7 @@ class ActivityRecordTest {
                 .environmentName(applicationEnvironment).build();
 
         ProducerRecord<String, SpecificRecordBase> result = record.toProducerRecord(config);
-        assertTrue(result.value() instanceof ActivityRecordAvro);
+        assertInstanceOf(ActivityRecordAvro.class, result.value());
         ActivityRecordAvro activityRecordAvro = (ActivityRecordAvro) result.value();
         assertEquals(applicationEnvironment, activityRecordAvro.getApplicationEnvironment());
     }
@@ -114,7 +116,7 @@ class ActivityRecordTest {
                 .eventName("Innlogget")
                 .eventDescription("Description")
                 .eventActorId("actorId")
-                .eventSubjectPid("12345")
+                .eventSubjectPid(FNR)
                 .authEid("eid")
                 .authMethod("method")
                 .correlationId("correlationId")
@@ -153,8 +155,12 @@ class ActivityRecordTest {
         assertEquals(record.getCorrelationId(), avroRecord.getCorrelationId());
         assertEquals(record.getExtraData(), avroRecord.getExtraData());
         assertEquals(record.getEventCreated().toEpochMilli(), avroRecord.getEventCreated().toEpochMilli());
-
+        assertEquals(1994, avroRecord.getSubjectBirthyear());
+        assertEquals(Period.between(DateUtil.computeDOB(record.getEventSubjectPid()).get(), record.getEventCreated()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()).getYears(), avroRecord.getSubjectAgeAtEvent());
         assertEquals(record.getApplicationEnvironment(), avroRecord.getApplicationEnvironment());
         assertEquals(record.getApplicationName(), avroRecord.getApplicationName());
     }
+
 }

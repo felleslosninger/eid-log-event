@@ -6,8 +6,14 @@ import no.digdir.logging.event.generated.ActivityRecordAvro;
 import org.apache.avro.specific.SpecificRecordBase;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static no.digdir.logging.event.DateUtil.computeDOB;
 
 @Getter
 public class ActivityRecord extends EventRecordBase {
@@ -56,7 +62,7 @@ public class ActivityRecord extends EventRecordBase {
 
     @Override
     protected SpecificRecordBase toAvroObject() {
-        return ActivityRecordAvro.newBuilder()
+        ActivityRecordAvro.Builder recordBuilder = ActivityRecordAvro.newBuilder()
                 .setEventName(getEventName())
                 .setEventDescription(getEventDescription())
                 .setEventCreated(getEventCreated())
@@ -75,7 +81,19 @@ public class ActivityRecord extends EventRecordBase {
                 .setServiceOwnerOrgno(serviceOwnerOrgno)
                 .setServiceOwnerName(serviceOwnerName)
                 .setAuthEid(authEid)
-                .setAuthMethod(authMethod)
-                .build();
+                .setAuthMethod(authMethod);
+
+        if (eventSubjectPid != null ) {
+            Optional<LocalDate> dateOfBirth = computeDOB(eventSubjectPid);
+            if (dateOfBirth.isPresent()) {
+                recordBuilder.setSubjectBirthyear(dateOfBirth.get().getYear());
+                recordBuilder.setSubjectAgeAtEvent(
+                        Period.between(dateOfBirth.orElse(null), getEventCreated().atZone(ZoneId.systemDefault())
+                        .toLocalDate()).getYears());
+            }
+        }
+
+        return recordBuilder.build();
     }
+
 }
