@@ -5,9 +5,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class DateUtilTest {
 
@@ -19,7 +19,7 @@ class DateUtilTest {
             "09909774591, 1897-10-09",
     })
     void computeDOB(String pid, LocalDate dateOfBirth) {
-        assertEquals(dateOfBirth, DateUtil.computeDOB(pid));
+        assertEquals(dateOfBirth, DateUtil.computeDOB(pid).get());
     }
 
     @ParameterizedTest
@@ -30,7 +30,7 @@ class DateUtilTest {
             "123",
             ""
     })
-    void computeDOB_shouldReturnNull(String pid) {
-        assertNull(DateUtil.computeDOB(pid));
+    void computeDOB_shouldReturnEmtpy(String pid) {
+        assertEquals(Optional.empty(), DateUtil.computeDOB(pid));
     }
 }

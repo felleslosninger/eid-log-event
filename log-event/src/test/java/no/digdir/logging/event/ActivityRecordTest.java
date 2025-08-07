@@ -156,7 +156,7 @@ class ActivityRecordTest {
         assertEquals(record.getExtraData(), avroRecord.getExtraData());
         assertEquals(record.getEventCreated().toEpochMilli(), avroRecord.getEventCreated().toEpochMilli());
         assertEquals(1994, avroRecord.getSubjectBirthyear());
-        assertEquals(Period.between(DateUtil.computeDOB(record.getEventSubjectPid()), record.getEventCreated()
+        assertEquals(Period.between(DateUtil.computeDOB(record.getEventSubjectPid()).get(), record.getEventCreated()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()).getYears(), avroRecord.getSubjectAgeAtEvent());
         assertEquals(record.getApplicationEnvironment(), avroRecord.getApplicationEnvironment());

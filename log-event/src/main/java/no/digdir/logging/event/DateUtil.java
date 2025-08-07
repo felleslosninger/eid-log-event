@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -14,9 +15,9 @@ class DateUtil {
 
     private static final Pattern ELEVEN_DIGITS = Pattern.compile("^\\d{11}$");
 
-    static LocalDate computeDOB(String eventSubjectPid) {
+    static Optional<LocalDate> computeDOB(String eventSubjectPid) {
         if (!ELEVEN_DIGITS.matcher(eventSubjectPid).matches()) {
-            return null;
+            return Optional.empty();
         }
 
         boolean isDnumber = false;
@@ -25,7 +26,7 @@ class DateUtil {
             isDnumber = true;
         }
         if (digits[0] > 7) {
-            return null;
+            return Optional.empty();
         }
         final int INDIVID_NR_END_INDEX = 9;
         final int INDIVID_NR_START_INDEX = 6;
@@ -36,23 +37,23 @@ class DateUtil {
         final int individNumber = Integer.parseInt(eventSubjectPid.substring(INDIVID_NR_START_INDEX, INDIVID_NR_END_INDEX));
         final int century = getCentury(individNumber, year, isDnumber);
         if (century < 0) {
-            return null;
+            return Optional.empty();
         }
 
         return parseDate(day, month, century, year);
     }
 
-    private static LocalDate parseDate(final int day, int month, int century, int year) {
+    private static Optional<LocalDate> parseDate(final int day, int month, int century, int year) {
         final String dateString = String.format("%02d%02d%02d%02d", day, month, century, year);
         try {
             final DateFormat df = new SimpleDateFormat("ddMMyyyy");
             df.setLenient(false);
-            return df.parse(dateString)
+            return Optional.ofNullable(df.parse(dateString)
                     .toInstant()
                     .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-        } catch (final ParseException e) {
-            return null;
+                    .toLocalDate());
+        } catch (final ParseException ignored) {
+            return Optional.empty();
         }
     }
 
@@ -86,28 +87,28 @@ class DateUtil {
         return month > 20 && month <= 32;
     }
 
-    private static int getCentury(final int individnumber, final int birthYear, boolean isDnumber) {
+    private static int getCentury(final int individNumber, final int birthYear, boolean isDnumber) {
         if (isDnumber) {
-            if (individnumber >= 500 && individnumber <= 599) {
+            if (individNumber >= 500 && individNumber <= 599) {
                 return 18;
-            } else if (individnumber <= 199 && birthYear < 40) {
+            } else if (individNumber <= 199 && birthYear < 40) {
                 return 19;
-            } else if ((individnumber <= 499 || (individnumber >= 600 && individnumber <= 999)) && birthYear >= 40) {
+            } else if ((individNumber <= 499 || (individNumber >= 600 && individNumber <= 999)) && birthYear >= 40) {
                 return 19;
-            } else if (individnumber >= 200 && individnumber <= 999 && birthYear < 40) {
+            } else if (individNumber >= 200 && individNumber <= 999 && birthYear < 40) {
                 return 20;
             }
         } else { // fnr
-            if (individnumber <= 499) {
+            if (individNumber <= 499) {
                 return 19;
             }
-            if (individnumber >= 500 && individnumber <= 749 && birthYear > 54) {
+            if (individNumber >= 500 && individNumber <= 749 && birthYear > 54) {
                 return 18;
             }
-            if (individnumber >= 500 && birthYear < 40) {
+            if (individNumber >= 500 && birthYear < 40) {
                 return 20;
             }
-            if (individnumber >= 900 && birthYear >= 40) {
+            if (individNumber >= 900 && birthYear >= 40) {
                 return 19;
             }
         }

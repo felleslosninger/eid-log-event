@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static no.digdir.logging.event.DateUtil.computeDOB;
@@ -27,8 +28,6 @@ public class ActivityRecord extends EventRecordBase {
     private final String serviceOwnerName;
     private final String authEid;
     private final String authMethod;
-    private final Integer subjectBirthYear;
-    private final Integer subjectAgeAtEvent;
 
     @Builder
     public ActivityRecord(
@@ -46,8 +45,6 @@ public class ActivityRecord extends EventRecordBase {
             String serviceOwnerName,
             String authEid,
             String authMethod,
-            Integer subjectBirthyear,
-            Integer subjectAgeAtEvent,
             Instant eventCreated) {
         super(eventName, eventDescription, correlationId, extraData, eventCreated);
         this.eventActorId = eventActorId;
@@ -60,8 +57,6 @@ public class ActivityRecord extends EventRecordBase {
         this.serviceOwnerName = serviceOwnerName;
         this.authEid = authEid;
         this.authMethod = authMethod;
-        this.subjectBirthYear = subjectBirthyear;
-        this.subjectAgeAtEvent = subjectAgeAtEvent;
     }
 
 
@@ -88,12 +83,12 @@ public class ActivityRecord extends EventRecordBase {
                 .setAuthEid(authEid)
                 .setAuthMethod(authMethod);
 
-        if (subjectBirthYear == null && subjectAgeAtEvent == null && eventSubjectPid != null ) {
-            LocalDate dateOfBirth = computeDOB(eventSubjectPid);
-            if (dateOfBirth != null) {
-                recordBuilder.setSubjectBirthyear(dateOfBirth.getYear());
+        if (eventSubjectPid != null ) {
+            Optional<LocalDate> dateOfBirth = computeDOB(eventSubjectPid);
+            if (dateOfBirth.isPresent()) {
+                recordBuilder.setSubjectBirthyear(dateOfBirth.get().getYear());
                 recordBuilder.setSubjectAgeAtEvent(
-                        Period.between(dateOfBirth, getEventCreated().atZone(ZoneId.systemDefault())
+                        Period.between(dateOfBirth.orElse(null), getEventCreated().atZone(ZoneId.systemDefault())
                         .toLocalDate()).getYears());
             }
         }
