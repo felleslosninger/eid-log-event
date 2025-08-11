@@ -1,9 +1,8 @@
 package no.digdir.logging.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import no.digdir.logging.event.generated.ActivityRecordAvro;
-import org.apache.avro.specific.SpecificRecordBase;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,23 +10,36 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static no.digdir.logging.event.DateUtil.computeDOB;
 
 @Getter
 public class ActivityRecord extends EventRecordBase {
 
+    @JsonProperty("event_actor_id")
     private final String eventActorId;
+    @JsonProperty("event_subject_pid")
     private final String eventSubjectPid;
+    @JsonProperty("service_provider_id")
     private final String serviceProviderId;
+    @JsonProperty("service_provider_orgno")
     private final String serviceProviderOrgno;
+    @JsonProperty("service_provider_name")
     private final String serviceProviderName;
+    @JsonProperty("service_owner_id")
     private final String serviceOwnerId;
+    @JsonProperty("service_owner_orgno")
     private final String serviceOwnerOrgno;
+    @JsonProperty("service_owner_name")
     private final String serviceOwnerName;
+    @JsonProperty("auth_eid")
     private final String authEid;
+    @JsonProperty("auth_method")
     private final String authMethod;
+    @JsonProperty("subject_birthyear")
+    private final Integer subjectBirthYear;
+    @JsonProperty("subject_age_at_event")
+    private final Integer subjectAgeAtEvent;
 
     @Builder
     public ActivityRecord(
@@ -57,43 +69,15 @@ public class ActivityRecord extends EventRecordBase {
         this.serviceOwnerName = serviceOwnerName;
         this.authEid = authEid;
         this.authMethod = authMethod;
-    }
-
-
-    @Override
-    protected SpecificRecordBase toAvroObject() {
-        ActivityRecordAvro.Builder recordBuilder = ActivityRecordAvro.newBuilder()
-                .setEventName(getEventName())
-                .setEventDescription(getEventDescription())
-                .setEventCreated(getEventCreated())
-                .setApplicationEnvironment(getApplicationEnvironment())
-                .setApplicationName(getApplicationName())
-                .setCorrelationId(getCorrelationId())
-                .setExtraData(getExtraData() == null ? null : getExtraData().entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-                .setEventActorId(eventActorId)
-                .setEventSubjectPid(eventSubjectPid)
-                .setServiceProviderId(serviceProviderId)
-                .setServiceProviderOrgno(serviceProviderOrgno)
-                .setServiceProviderName(serviceProviderName)
-                .setServiceOwnerId(serviceOwnerId)
-                .setServiceOwnerOrgno(serviceOwnerOrgno)
-                .setServiceOwnerName(serviceOwnerName)
-                .setAuthEid(authEid)
-                .setAuthMethod(authMethod);
-
-        if (eventSubjectPid != null ) {
-            Optional<LocalDate> dateOfBirth = computeDOB(eventSubjectPid);
-            if (dateOfBirth.isPresent()) {
-                recordBuilder.setSubjectBirthyear(dateOfBirth.get().getYear());
-                recordBuilder.setSubjectAgeAtEvent(
-                        Period.between(dateOfBirth.orElse(null), getEventCreated().atZone(ZoneId.systemDefault())
-                        .toLocalDate()).getYears());
-            }
+        Optional<LocalDate> dateOfBirth = computeDOB(this.eventSubjectPid);
+        if (dateOfBirth.isPresent()) {
+            this.subjectBirthYear = dateOfBirth.get().getYear();
+            this.subjectAgeAtEvent =
+                    Period.between(dateOfBirth.orElse(null), getEventCreated().atZone(ZoneId.systemDefault())
+                            .toLocalDate()).getYears();
+        } else {
+            this.subjectBirthYear = null;
+            this.subjectAgeAtEvent = null;
         }
-
-        return recordBuilder.build();
     }
-
 }

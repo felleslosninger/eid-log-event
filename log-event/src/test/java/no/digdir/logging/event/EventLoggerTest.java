@@ -1,14 +1,15 @@
 package no.digdir.logging.event;
 
-import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
-import no.digdir.logging.event.generated.ActivityRecordAvro;
-import org.apache.avro.specific.SpecificRecordBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;
 import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,6 @@ class EventLoggerTest {
             .applicationName(APPLICATION_NAME)
             .environmentName(ENVIRONMENT_NAME)
             .bootstrapServers(DUMMY_URL)
-            .schemaRegistryUrl(DUMMY_URL)
             .kafkaUsername(USERNAME)
             .threadPoolSize(POOL_SIZE)
             .build();
@@ -80,13 +80,12 @@ class EventLoggerTest {
         }
     };
     private DefaultEventLogger eventLogger;
-    private MockProducer<String, SpecificRecordBase> kafkaProducer;
+    private MockProducer<String, String> kafkaProducer;
     private ExecutorService executorService;
 
     @BeforeEach
     void setUp() {
-        MockSchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
-        SpecificAvroSerde<SpecificRecordBase> serde = new SpecificAvroSerde<>(schemaRegistryClient);
+        Serde<String> serde = new Serdes.StringSerde();
         serde.configure(config.getProducerConfig(), false);
 
         kafkaProducer = spy(new MockProducer<>(true, partitioner, new StringSerializer(), serde.serializer()));
@@ -130,20 +129,23 @@ class EventLoggerTest {
     }
 
     @Test
-    void defaultCreationTimestamp() throws ExecutionException, InterruptedException {
+    void defaultCreationTimestamp() throws ExecutionException, InterruptedException, JsonProcessingException {
         eventLogger.log(record);
         kafkaProducer.flush();
         Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) kafkaProducer.history().get(0).value();
+        String jsonRecord = kafkaProducer.history().get(0).value();
+        // Parse the JSON string to a JsonNode for easier property access
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(jsonRecord);
 
-        assertTrue(Instant.now().isAfter(loggedRecord.getEventCreated()),
+        assertTrue(Instant.now().isAfter(Instant.ofEpochMilli(jsonNode.get("event_created").asLong())),
                 "Creation timestamp should be earlier than current time");
     }
 
     @Test
-    void defaultApplicationName() throws ExecutionException, InterruptedException {
+    void defaultApplicationName() throws ExecutionException, InterruptedException, JsonProcessingException {
         assertNull(record.getApplicationName(), "Test is void: application name set directly on record");
 
         eventLogger.log(record);
@@ -151,12 +153,16 @@ class EventLoggerTest {
         Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) kafkaProducer.history().get(0).value();
-        assertEquals(APPLICATION_NAME, loggedRecord.getApplicationName(), "Application name not set from config");
+        String jsonRecord = kafkaProducer.history().get(0).value();
+        // Parse the JSON string to a JsonNode for easier property access
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(jsonRecord);
+        assertEquals(APPLICATION_NAME, jsonNode.get("application_name")
+                .asText(), "Application name not set from config");
     }
 
     @Test
-    void defaultEnvironmentName() throws ExecutionException, InterruptedException {
+    void defaultEnvironmentName() throws ExecutionException, InterruptedException, JsonProcessingException {
         assertNull(record.getApplicationName(), "Test is void: environment name set directly on record");
 
         eventLogger.log(record);
@@ -164,8 +170,12 @@ class EventLoggerTest {
         Future<Integer> sentEventsFuture = executorService.submit(() -> kafkaProducer.history().size());
 
         assertEquals(1, sentEventsFuture.get(), "Record should be published");
-        ActivityRecordAvro loggedRecord = (ActivityRecordAvro) kafkaProducer.history().get(0).value();
-        assertEquals(ENVIRONMENT_NAME, loggedRecord.getApplicationEnvironment(), "Environment name not set from config");
+        String jsonRecord = kafkaProducer.history().get(0).value();
+        // Parse the JSON string to a JsonNode for easier property access
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(jsonRecord);
+        assertEquals(ENVIRONMENT_NAME, jsonNode.get("application_environment")
+                .asText(), "Environment name not set from config");
     }
 
     @Test
@@ -183,7 +193,6 @@ class EventLoggerTest {
                 .applicationName(APPLICATION_NAME)
                 .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
-                .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
                 .activityRecordTopic("any topic")
                 .featureEnabled(true)
@@ -201,7 +210,6 @@ class EventLoggerTest {
                 .applicationName(APPLICATION_NAME)
                 .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(DUMMY_URL)
-                .schemaRegistryUrl(DUMMY_URL)
                 .kafkaUsername(USERNAME)
                 .activityRecordTopic("any topic")
                 .featureEnabled(true)

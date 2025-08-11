@@ -1,7 +1,6 @@
 package no.digdir.logging.event;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,9 +39,6 @@ class EventLoggingConfigFactory {
                     .maskinportenAuthenticationRecordTopic(eventLoggingConfigurationProperties.getMaskinportenAuthenticationRecordTopic())
                     .kafkaUsername(eventLoggingConfigurationProperties.getKafkaUsername())
                     .kafkaPassword(eventLoggingConfigurationProperties.getKafkaPassword())
-                    .schemaRegistryUrl(eventLoggingConfigurationProperties.getSchemaRegistryUrl())
-                    .schemaRegistryPassword(eventLoggingConfigurationProperties.getSchemaRegistryPassword())
-                    .schemaRegistryUsername(eventLoggingConfigurationProperties.getSchemaRegistryUsername())
                     .threadPoolSize(eventLoggingConfigurationProperties.getThreadPoolSize())
                     .build();
         }
@@ -51,14 +47,14 @@ class EventLoggingConfigFactory {
         @ConditionalOnMissingBean(EventLogger.class)
         public EventLogger defaultEventLogger(
                 EventLoggingConfig eventLoggingConfig,
-                @Qualifier("eventLoggerProducer") Producer<String, SpecificRecordBase> eventLoggerProducer,
+                @Qualifier("eventLoggerProducer") Producer<String, String> eventLoggerProducer,
                 @Qualifier("eventLoggerExecutorService") ExecutorService eventLoggerExecutorService) {
             return new DefaultEventLogger(eventLoggingConfig, eventLoggerProducer, eventLoggerExecutorService);
         }
 
         @Bean(name = "eventLoggerProducer")
         @ConditionalOnMissingBean(name = "eventLoggerProducer")
-        public Producer<String, SpecificRecordBase> eventLoggerProducer(EventLoggingConfig config) {
+        public Producer<String, String> eventLoggerProducer(EventLoggingConfig config) {
             return new EventLoggerKafkaProducer(config);
         }
 

@@ -1,12 +1,9 @@
 package no.digdir.logging.event;
 
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import static no.digdir.logging.event.EventLoggingConfig.ACTIVITY_RECORD_TOPIC_KEY;
-import static no.digdir.logging.event.EventLoggingConfig.BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO;
 import static no.digdir.logging.event.EventLoggingConfig.ENVIRONMENT_NAME;
 import static no.digdir.logging.event.EventLoggingConfig.MP_AUTH_RECORD_TOPIC_KEY;
 import static no.digdir.logging.event.EventLoggingConfig.MP_TOKEN_RECORD_TOPIC_KEY;
@@ -26,7 +23,6 @@ class EventLoggingConfigTest {
                 .environmentName(environmentName)
                 .bootstrapServers("server")
                 .kafkaUsername("franz")
-                .schemaRegistryUrl("registry")
                 .activityRecordTopic("testTopic")
                 .maskinportenAuthenticationRecordTopic("authTopic")
                 .maskinportenTokenRecordTopic("tokenTopic")
@@ -47,7 +43,6 @@ class EventLoggingConfigTest {
                 .environmentName("unit")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
                 .activityRecordTopic("activityRecordTopic")
                 .maskinportenAuthenticationRecordTopic("maskinportenAuthenticationRecordTopic")
                 .maskinportenTokenRecordTopic("maskinportenTokenRecordTopic")
@@ -67,7 +62,6 @@ class EventLoggingConfigTest {
                 .environmentName("unit")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
                 .activityRecordTopic("activityRecordTopic")
                 .maskinportenAuthenticationRecordTopic("maskinportenAuthenticationRecordTopic")
                 .maskinportenTokenRecordTopic("maskinportenTokenRecordTopic")
@@ -87,7 +81,6 @@ class EventLoggingConfigTest {
                 .environmentName("unit")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
                 .activityRecordTopic("activityRecordTopic")
                 .maskinportenAuthenticationRecordTopic("maskinportenAuthenticationRecordTopic")
                 .maskinportenTokenRecordTopic("maskinportenTokenRecordTopic")
@@ -107,10 +100,9 @@ class EventLoggingConfigTest {
                 .environmentName("unit")
                 .bootstrapServers("abc")
                 .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
                 .build();
 
-        assertEquals("aktiviteter", eventLoggingConfig.getActivityRecordTopic(), "The eventTopic default value activities should be there when its not provided in the builder");
+        assertEquals("aktiviteter-json", eventLoggingConfig.getActivityRecordTopic(), "The eventTopic default value activities should be there when its not provided in the builder");
         assertFalse(eventLoggingConfig.getProducerConfig()
                 .containsKey(ACTIVITY_RECORD_TOPIC_KEY), "The eventTopic should not be present in the producerConfig");
     }
@@ -121,7 +113,6 @@ class EventLoggingConfigTest {
                 .environmentName("unit")
                 .kafkaUsername("franz")
                 .bootstrapServers("server")
-                .schemaRegistryUrl("registry")
                 .build(), "ApplicationName is a required field");
     }
 
@@ -131,7 +122,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .kafkaUsername("franz")
                 .bootstrapServers("server")
-                .schemaRegistryUrl("registry")
                 .build(), "EnvironmentName is a required field");
     }
 
@@ -141,28 +131,7 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
                 .build(), "BootStrapServers is a required field");
-    }
-
-    @Test
-    void schemaRegistryUrlIsRequired() {
-        assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
-                .applicationName("testApplicationName")
-                .environmentName("unit")
-                .kafkaUsername("abc")
-                .bootstrapServers("abc")
-                .build(), "schemaRegistryUrl is a required field");
-    }
-
-    @Test
-    void kafkaUsernameIsRequired() {
-        assertThrows(NullPointerException.class, () -> EventLoggingConfig.builder()
-                .applicationName("testApplicationName")
-                .environmentName("unit")
-                .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
-                .build(), "kafkaUsername is a required field");
     }
 
     @Test
@@ -171,7 +140,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .build();
         assertTrue(config.isFeatureEnabled(), "Feature should be enabled by default");
@@ -183,7 +151,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .featureEnabled(true)
                 .build();
@@ -196,7 +163,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .featureEnabled(false)
                 .build();
@@ -209,7 +175,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .featureEnabled(true)
                 .threadPoolSize(20)
@@ -223,7 +188,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .featureEnabled(true)
                 .threadPoolQueueSize(200)
@@ -237,7 +201,6 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .featureEnabled(true)
                 .build();
@@ -250,68 +213,10 @@ class EventLoggingConfigTest {
                 .applicationName("testApplicationName")
                 .environmentName("unit")
                 .bootstrapServers("abc")
-                .schemaRegistryUrl("abc")
                 .kafkaUsername("abc")
                 .featureEnabled(true)
                 .build();
         assertEquals(4, config.getThreadPoolSize(), "ThreadPoolSize default should be 4");
-    }
-
-    @Test
-    void noSchemaRegistryUsername() {
-        EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .applicationName("testApplicationName")
-                .environmentName("unit")
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
-                .build();
-
-        assertEquals(
-                AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT,
-                eventLoggingConfig.getProducerConfig().get(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE),
-                "If no schemaRegistryUsername is provided, the authentication against schemaRegistry should be set to 'URL'");
-    }
-
-    @Test
-    void withSchemaRegistryUsernameAndPassword() {
-        EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .applicationName("testApplicationName")
-                .environmentName("unit")
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
-                .schemaRegistryUsername("username")
-                .schemaRegistryPassword("password")
-                .build();
-
-        assertEquals(
-                BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO,
-                eventLoggingConfig.getProducerConfig().get(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE),
-                "When schemaRegistryUsername is provided, the authentication against schemaRegistry should be set to 'USER_INFO'");
-        assertEquals("username:password", eventLoggingConfig.getProducerConfig()
-                        .get(KafkaAvroSerializerConfig.USER_INFO_CONFIG),
-                "The userinfo is expected in the format username:password");
-    }
-
-    @Test
-    void withSchemaRegistryUsernameAndNoPassword() {
-        EventLoggingConfig eventLoggingConfig = EventLoggingConfig.builder()
-                .applicationName("testApplicationName")
-                .environmentName("unit")
-                .bootstrapServers("abc")
-                .kafkaUsername("abc")
-                .schemaRegistryUrl("abc")
-                .schemaRegistryUsername("username")
-                .build();
-
-        assertEquals(
-                BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO,
-                eventLoggingConfig.getProducerConfig().get(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE),
-                "When schemaRegistryUsername is provided, the authentication against schemaRegistry should be set to 'USER_INFO'");
-        assertEquals("username:", eventLoggingConfig.getProducerConfig()
-                        .get(KafkaAvroSerializerConfig.USER_INFO_CONFIG),
-                "The userinfo is expected in the format username:password, when no password is provided the password should be empty");
     }
 
     @Test
@@ -321,7 +226,6 @@ class EventLoggingConfigTest {
                 .environmentName("unit")
                 .bootstrapServers("broker")
                 .kafkaUsername("user")
-                .schemaRegistryUrl("registry")
                 .build();
 
         assertEquals("32601", eventLoggingConfig.getProducerConfig().get("batch.size"));

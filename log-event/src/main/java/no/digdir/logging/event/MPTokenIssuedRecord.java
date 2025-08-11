@@ -1,26 +1,31 @@
 package no.digdir.logging.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import no.digdir.logging.event.generated.MaskinPortenTokenIssuedAvro;
-import no.digdir.logging.event.generated.TokenScopeAvro;
-import org.apache.avro.specific.SpecificRecordBase;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 public class MPTokenIssuedRecord extends EventRecordBase {
 
+    @JsonProperty("client_id")
     private final String clientId;
+    @JsonProperty("client_orgno")
     private final String clientOrgno;
+    @JsonProperty("client_on_behalf_of_id")
     private final String clientOnBehalfOfId;
+    @JsonProperty("token_iss")
     private final String tokenIss;
+    @JsonProperty("token_lifetime_seconds")
     private final Integer tokenLifetimeSeconds;
+    @JsonProperty("token_scopes")
     private final List<TokenScope> tokenScopes;
+    @JsonProperty("supplier")
     private final String supplier;
+    @JsonProperty("consumer")
     private final String consumer;
 
     @Builder
@@ -49,40 +54,11 @@ public class MPTokenIssuedRecord extends EventRecordBase {
         this.consumer = consumer;
     }
 
-    @Override
-    protected SpecificRecordBase toAvroObject() {
-        return MaskinPortenTokenIssuedAvro.newBuilder()
-                .setEventName(getEventName())
-                .setEventDescription(getEventDescription())
-                .setEventCreated(getEventCreated())
-                .setApplicationEnvironment(getApplicationEnvironment())
-                .setApplicationName(getApplicationName())
-                .setCorrelationId(getCorrelationId())
-                .setExtraData(getExtraData() == null ? null : getExtraData().entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-                .setClientId(clientId)
-                .setClientOrgno(clientOrgno)
-                .setClientOnBehalfOfId(clientOnBehalfOfId)
-                .setTokenIss(tokenIss)
-                .setTokenLifetimeSeconds(tokenLifetimeSeconds)
-                .setTokenScopes(
-                        tokenScopes == null ? null :
-                                tokenScopes.stream()
-                                        .map(tokenScope -> TokenScopeAvro.newBuilder()
-                                                .setScope(tokenScope.scope)
-                                                .setDelegationSource(tokenScope.delegationSource)
-                                                .build())
-                                        .collect(Collectors.toList())
-                )
-                .setSupplier(supplier)
-                .setConsumer(consumer)
-                .build();
-    }
-
     @Getter
     public static class TokenScope {
+        @JsonProperty("scope")
         private final String scope;
+        @JsonProperty("delegation_source")
         private final String delegationSource;
 
         @Builder

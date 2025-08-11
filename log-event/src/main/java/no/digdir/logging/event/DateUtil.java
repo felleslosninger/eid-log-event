@@ -16,6 +16,10 @@ class DateUtil {
     private static final Pattern ELEVEN_DIGITS = Pattern.compile("^\\d{11}$");
 
     static Optional<LocalDate> computeDOB(String eventSubjectPid) {
+        if (eventSubjectPid == null) {
+            return Optional.empty();
+        }
+
         if (!ELEVEN_DIGITS.matcher(eventSubjectPid).matches()) {
             return Optional.empty();
         }

@@ -1,25 +1,32 @@
 package no.digdir.logging.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import no.digdir.logging.event.generated.MaskinportenAuthenticationAvro;
-import org.apache.avro.specific.SpecificRecordBase;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 public class MPAuthenticationRecord extends EventRecordBase {
 
+    @JsonProperty("client_id")
     private final String clientId;
+    @JsonProperty("client_orgno")
     private final String clientOrgno;
+    @JsonProperty("client_on_behalf_of_id")
     private final String clientOnBehalfOfId;
+    @JsonProperty("certificate_issuer")
     private final String certificateIssuer;
+    @JsonProperty("certificate_serial_number")
     private final String certificateSerialNumber;
+    @JsonProperty("kid")
     private final String kid;
+    @JsonProperty("aud")
     private final String aud;
+    @JsonProperty("token_endpoint_auth_method")
     private final String tokenEndpointAuthMethod;
+    @JsonProperty("consumer")
     private final String consumer;
 
     @Builder
@@ -48,29 +55,5 @@ public class MPAuthenticationRecord extends EventRecordBase {
         this.aud = aud;
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
         this.consumer = consumer;
-    }
-
-    @Override
-    protected SpecificRecordBase toAvroObject() {
-        return MaskinportenAuthenticationAvro.newBuilder()
-                .setEventName(getEventName())
-                .setEventDescription(getEventDescription())
-                .setEventCreated(getEventCreated())
-                .setApplicationEnvironment(getApplicationEnvironment())
-                .setApplicationName(getApplicationName())
-                .setCorrelationId(getCorrelationId())
-                .setExtraData(getExtraData() == null ? null : getExtraData().entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-                .setClientId(clientId)
-                .setClientOrgno(clientOrgno)
-                .setClientOnBehalfOfId(clientOnBehalfOfId)
-                .setCertificateIssuer(certificateIssuer)
-                .setCertificateSerialNumber(certificateSerialNumber)
-                .setKid(kid)
-                .setAud(aud)
-                .setTokenEndpointAuthMethod(tokenEndpointAuthMethod)
-                .setConsumer(consumer)
-                .build();
     }
 }

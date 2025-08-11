@@ -42,7 +42,6 @@ import no.digdir.logging.event.EventLoggingConfig;
                 .applicationName(APPLICATION_NAME)
                 .environmentName(ENVIRONMENT_NAME)
                 .bootstrapServers(BROKER_HOST_AND_PORT)
-                .schemaRegistryUrl(REGISTRY_HOST_AND_PORT)
                 .kafkaUsername(USERNAME)
                 .kafkaPassword(PASSWORD)
                 .threadPoolSize(8) // Defaults to 4 if not set
@@ -95,11 +94,8 @@ digdir:
     logging:
       environment-name: dev
       bootstrap-servers: example.com:80
-      schema-registry-url: example.com:80
       kafka-username: kafkaUsername
       kafka-password: kafkaPassword
-      schema-registry-password: schemaPassword
-      schema-registry-username: schemaUsername
       activity-record-topic: activityTopic #Do not set unless you know you want to ship to different location than the default topic
       maskinporten-token-record-topic: mpTokenTopic #Do not set unless you know you want to ship to different location than the default topic
       maskinporten-authentication-record-topic: mpAuthTopic #Do not set unless you know you want to ship to different location than the default topic
