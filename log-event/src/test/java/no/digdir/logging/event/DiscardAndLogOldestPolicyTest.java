@@ -1,6 +1,6 @@
 package no.digdir.logging.event;
 
-import org.apache.avro.specific.SpecificRecordBase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.junit.jupiter.api.Test;
@@ -22,14 +22,14 @@ class DiscardAndLogOldestPolicyTest {
             .applicationName("app")
             .environmentName("env")
             .bootstrapServers("localhost:443")
-            .schemaRegistryUrl("localhost:433")
             .kafkaUsername("user")
             .threadPoolSize(1)
             .build();
-    private final Producer<String, SpecificRecordBase> kafkaProducer = new KafkaProducer<>(config.getProducerConfig());
+    private final Producer<String, String> kafkaProducer = new KafkaProducer<>(config.getProducerConfig());
+    private final DefaultEventLogger eventLogger = new DefaultEventLogger(config, kafkaProducer, executor);
 
     @Test
-    void testOldestIsDescheduled() {
+    void testOldestIsDescheduled() throws JsonProcessingException {
         KafkaTask oldKafkaTask = createKafkaTask("OldEvent");
         when(executor.getQueue()).thenReturn(queue);
         when(queue.poll()).thenReturn(oldKafkaTask);
@@ -41,8 +41,8 @@ class DiscardAndLogOldestPolicyTest {
         verify(queue).poll();
     }
 
-    private KafkaTask createKafkaTask(String eventName) {
-        return new KafkaTask(ActivityRecord.builder()
+    private KafkaTask createKafkaTask(String eventName) throws JsonProcessingException {
+        return new KafkaTask(eventLogger.toProducerRecord(ActivityRecord.builder()
                 .eventName(eventName)
                 .eventDescription("Brukeren har logget inn")
                 .eventSubjectPid("123")
@@ -51,6 +51,6 @@ class DiscardAndLogOldestPolicyTest {
                 .serviceOwnerId("Andeby kommune")
                 .authEid("MinID")
                 .authMethod("OTC")
-                .build().toProducerRecord(config), kafkaProducer);
+                .build()), kafkaProducer);
     }
 }

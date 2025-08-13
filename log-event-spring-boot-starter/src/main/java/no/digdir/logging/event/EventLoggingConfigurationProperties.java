@@ -14,11 +14,8 @@ class EventLoggingConfigurationProperties {
     private final boolean featureEnabled;
     private final String environmentName;
     private final String bootstrapServers;
-    private final String schemaRegistryUrl;
     private final String kafkaUsername;
     private final String kafkaPassword;
-    private final String schemaRegistryUsername;
-    private final String schemaRegistryPassword;
     private final String activityRecordTopic;
     private final String maskinportenTokenRecordTopic;
     private final String maskinportenAuthenticationRecordTopic;
@@ -28,11 +25,8 @@ class EventLoggingConfigurationProperties {
             Boolean featureEnabled,
             String environmentName,
             String bootstrapServers,
-            String schemaRegistryUrl,
             String kafkaUsername,
             String kafkaPassword,
-            String schemaRegistryUsername,
-            String schemaRegistryPassword,
             String activityRecordTopic,
             String maskinportenTokenRecordTopic,
             String maskinportenAuthenticationRecordTopic,
@@ -40,11 +34,8 @@ class EventLoggingConfigurationProperties {
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(true);
         this.environmentName = environmentName;
         this.bootstrapServers = bootstrapServers;
-        this.schemaRegistryUrl = schemaRegistryUrl;
         this.kafkaUsername = kafkaUsername;
         this.kafkaPassword = kafkaPassword;
-        this.schemaRegistryUsername = schemaRegistryUsername;
-        this.schemaRegistryPassword = schemaRegistryPassword;
         this.activityRecordTopic = activityRecordTopic;
         this.maskinportenTokenRecordTopic = maskinportenTokenRecordTopic;
         this.maskinportenAuthenticationRecordTopic = maskinportenAuthenticationRecordTopic;

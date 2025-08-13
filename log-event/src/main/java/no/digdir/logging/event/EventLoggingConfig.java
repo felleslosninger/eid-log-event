@@ -1,7 +1,6 @@
 package no.digdir.logging.event;
 
 import com.google.common.base.Strings;
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -61,11 +60,6 @@ public class EventLoggingConfig {
     private final String bootstrapServers;
 
     /**
-     * Host and port of the Schema Registry (Confluent)
-     */
-    private final String schemaRegistryUrl;
-
-    /**
      * Login for the JAAS SASL configuration
      */
     private final String kafkaUsername;
@@ -74,16 +68,6 @@ public class EventLoggingConfig {
      * Password for the JAAS SASL configuration
      */
     private final String kafkaPassword;
-
-    /**
-     * Username for the Schema Registry, leave empty for no authentication
-     */
-    private final String schemaRegistryUsername;
-
-    /**
-     * Password for the Schema Registry
-     */
-    private final String schemaRegistryPassword;
 
     /**
      * Kafka topic to publish activityRecords to
@@ -119,19 +103,15 @@ public class EventLoggingConfig {
             String applicationName,
             String environmentName,
             String bootstrapServers,
-            String schemaRegistryUrl,
             String kafkaUsername,
             String kafkaPassword,
-            String schemaRegistryUsername,
-            String schemaRegistryPassword,
             String activityRecordTopic,
             String maskinportenAuthenticationRecordTopic,
             String maskinportenTokenRecordTopic,
             Integer threadPoolSize,
             Integer threadPoolQueueSize) {
         this.kafkaPassword = kafkaPassword;
-        this.schemaRegistryUsername = schemaRegistryUsername;
-        this.schemaRegistryPassword = schemaRegistryPassword;
+        this.kafkaUsername = kafkaUsername;
 
         Properties eventLoggerDefaultProperties = loadPropertiesFromFile(EVENT_LOGGER_PROPERTIES_FILE_PATH);
         this.featureEnabled = Optional.ofNullable(featureEnabled).orElse(
@@ -150,17 +130,9 @@ public class EventLoggingConfig {
             this.bootstrapServers = Objects.requireNonNull(bootstrapServers, String.format(
                     NULL_TEMPLATE,
                     ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-            this.schemaRegistryUrl = Objects.requireNonNull(schemaRegistryUrl, String.format(
-                    NULL_TEMPLATE,
-                    AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG));
-            this.kafkaUsername = Objects.requireNonNull(kafkaUsername, String.format(
-                    NULL_TEMPLATE,
-                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
             this.producerConfig = Collections.unmodifiableMap(createProducerConfig());
         } else {
             this.bootstrapServers = null;
-            this.schemaRegistryUrl = null;
-            this.kafkaUsername = null;
             this.producerConfig = null;
             this.applicationName = "N/A";
             this.environmentName = "N/A";
@@ -215,19 +187,6 @@ public class EventLoggingConfig {
         producerConfig.put(SaslConfigs.SASL_MECHANISM, resolveSaslMechanism(
                 bootstrapServers,
                 kafkaProducerProperties.getProperty(SaslConfigs.SASL_MECHANISM)));
-        producerConfig.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-        if (!Strings.isNullOrEmpty((schemaRegistryUsername))) {
-            producerConfig.put(
-                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
-                    BASIC_AUTH_CREDENTIALS_SOURCE_USER_INFO);
-            producerConfig.put(
-                    AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG,
-                    String.format("%s:%s", schemaRegistryUsername, Strings.nullToEmpty(schemaRegistryPassword)));
-        } else {
-            producerConfig.put(
-                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
-                    AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE_DEFAULT);
-        }
         producerConfig.put(
                 SaslConfigs.SASL_JAAS_CONFIG,
                 String.format(JAAS_CONFIG_TEMPLATE, kafkaUsername, kafkaPassword != null ? kafkaPassword : ""));

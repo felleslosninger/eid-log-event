@@ -1,6 +1,5 @@
 package no.digdir.logging.event;
 
-import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -14,12 +13,12 @@ import org.slf4j.LoggerFactory;
  */
 class KafkaTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(KafkaTask.class);
-    private final ProducerRecord<String, SpecificRecordBase> producerRecord;
-    private final Producer<String, SpecificRecordBase> producer;
+    private final ProducerRecord<String, String> producerRecord;
+    private final Producer<String, String> producer;
 
     public KafkaTask(
-            ProducerRecord<String, SpecificRecordBase> producerRecord,
-            Producer<String, SpecificRecordBase> producer) {
+            ProducerRecord<String, String> producerRecord,
+            Producer<String, String> producer) {
         this.producerRecord = producerRecord;
         this.producer = producer;
     }
@@ -39,7 +38,7 @@ class KafkaTask implements Runnable {
         }
     }
 
-    ProducerRecord<String, SpecificRecordBase> getProducerRecord() {
+    ProducerRecord<String, String> getProducerRecord() {
         return producerRecord;
     }
 }

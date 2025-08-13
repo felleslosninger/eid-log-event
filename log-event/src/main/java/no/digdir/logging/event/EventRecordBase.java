@@ -1,24 +1,31 @@
 package no.digdir.logging.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.Getter;
-import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
 
 @Getter
 public abstract class EventRecordBase {
+    @JsonProperty("event_name")
     private final String eventName;
+    @JsonProperty("event_created")
     private final Instant eventCreated;
+    @JsonProperty("event_description")
     private final String eventDescription;
+    @JsonProperty("correlation_id")
     private final String correlationId;
+    @JsonProperty("extra_data")
     private final Map<String, String> extraData;
-
-    private String kafkaTopicDestination;
+    @JsonProperty("application_name")
+    @Setter
     private String applicationName;
+    @JsonProperty("application_environment")
+    @Setter
     private String applicationEnvironment;
 
     protected EventRecordBase(
@@ -38,26 +45,4 @@ public abstract class EventRecordBase {
             this.eventCreated = Instant.now();
         }
     }
-
-    ProducerRecord<String, SpecificRecordBase> toProducerRecord(EventLoggingConfig eventLoggingConfig) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(eventLoggingConfig.getEnvironmentName()), "No application environment set");
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(eventLoggingConfig.getApplicationName()), "No application name set");
-
-        this.applicationName = eventLoggingConfig.getApplicationName();
-        this.applicationEnvironment = eventLoggingConfig.getEnvironmentName();
-
-        if (this instanceof ActivityRecord) {
-            this.kafkaTopicDestination = eventLoggingConfig.getActivityRecordTopic();
-        } else if (this instanceof MPAuthenticationRecord) {
-            this.kafkaTopicDestination = eventLoggingConfig.getMaskinportenAuthenticationRecordTopic();
-        } else if (this instanceof MPTokenIssuedRecord) {
-            this.kafkaTopicDestination = eventLoggingConfig.getMaskinportenTokenRecordTopic();
-        } else {
-            throw new IllegalStateException(String.format("Event type not supported: %s", this.getClass()));
-        }
-
-        return new ProducerRecord<>(kafkaTopicDestination, toAvroObject());
-    }
-
-    protected abstract SpecificRecordBase toAvroObject();
 }
