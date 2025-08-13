@@ -9,7 +9,6 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Metric;
@@ -53,7 +52,7 @@ class DefaultEventLogger implements EventLogger {
     @Override
     public void log(EventRecordBase eventRecord) {
         try {
-            executorService.submit(new KafkaTask(toProducerRecord(eventRecord), kafkaProducer))  ;
+            executorService.submit(new KafkaTask(toProducerRecord(eventRecord), kafkaProducer));
         } catch (JsonProcessingException e) {
             log.warn("Failed to serialize event record", e);
         }
