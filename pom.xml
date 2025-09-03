@@ -30,7 +30,7 @@
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <build-helper-maven-plugin>3.6.1</build-helper-maven-plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kafka.version>4.0.0</kafka.version>
+        <kafka.version>4.1.0</kafka.version>
         <confluent.version>8.0.0</confluent.version>
         <jackson.version>2.19.2</jackson.version>
         <lombok.version>1.18.38</lombok.version>
