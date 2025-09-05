@@ -33,7 +33,7 @@
         <kafka.version>4.0.0</kafka.version>
         <confluent.version>8.0.0</confluent.version>
         <jackson.version>2.19.2</jackson.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.40</lombok.version>
         <junit.version>5.13.4</junit.version>
         <mockito.version>5.19.0</mockito.version>
         <log4j2.version>2.25.1</log4j2.version>
