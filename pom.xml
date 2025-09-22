@@ -42,7 +42,7 @@
         <spring.boot.version>2.7.18</spring.boot.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <commons.lang3.version>3.18.0</commons.lang3.version>
-        <snakeyaml.version>2.4</snakeyaml.version> <!-- CVE-2022-25857 -->
+        <snakeyaml.version>2.5</snakeyaml.version> <!-- CVE-2022-25857 -->
         <jackson.version>2.20.0</jackson.version>
         <guava.version>33.5.0-jre</guava.version>
     </properties>
