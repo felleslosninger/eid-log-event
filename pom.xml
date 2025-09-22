@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>4.0.0</kafka.version>
         <confluent.version>8.0.0</confluent.version>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
         <lombok.version>1.18.42</lombok.version>
         <junit.version>5.13.4</junit.version>
         <mockito.version>5.19.0</mockito.version>
@@ -43,8 +43,8 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <commons.lang3.version>3.18.0</commons.lang3.version>
         <snakeyaml.version>2.4</snakeyaml.version> <!-- CVE-2022-25857 -->
+        <jackson.version>2.20.0</jackson.version>
         <guava.version>33.5.0-jre</guava.version>
-        <jackson.version>2.19.2</jackson.version>
     </properties>
 
     <dependencyManagement>
