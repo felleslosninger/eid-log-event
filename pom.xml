@@ -26,14 +26,14 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-        <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <build-helper-maven-plugin>3.6.1</build-helper-maven-plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>4.0.0</kafka.version>
         <confluent.version>8.0.0</confluent.version>
         <jackson.version>2.19.2</jackson.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <junit.version>5.13.4</junit.version>
         <mockito.version>5.19.0</mockito.version>
         <log4j2.version>2.25.1</log4j2.version>
@@ -43,7 +43,7 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <commons.lang3.version>3.18.0</commons.lang3.version>
         <snakeyaml.version>2.4</snakeyaml.version> <!-- CVE-2022-25857 -->
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <jackson.version>2.19.2</jackson.version>
     </properties>
 
