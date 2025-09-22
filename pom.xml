@@ -25,7 +25,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <build-helper-maven-plugin>3.6.1</build-helper-maven-plugin>
