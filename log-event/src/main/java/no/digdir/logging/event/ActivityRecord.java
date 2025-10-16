@@ -37,13 +37,13 @@ public class ActivityRecord extends EventRecordBase {
     @JsonProperty("auth_method")
     private final String authMethod;
     @JsonProperty("subject_birthyear")
-    private final Integer subjectBirthYear;
+    private  final Integer subjectBirthYear;
     @JsonProperty("subject_age_at_event")
     private final Integer subjectAgeAtEvent;
     @JsonProperty("user_agent")
     private final String userAgent;
     @JsonProperty("user_ip")
-    private final String userIP;
+    private final String userIp;
 
     @Builder
     public ActivityRecord(
@@ -63,7 +63,7 @@ public class ActivityRecord extends EventRecordBase {
             String authMethod,
             Instant eventCreated,
             String userAgent,
-            String userIP) {
+            String userIp) {
         super(eventName, eventDescription, correlationId, extraData, eventCreated);
         this.eventActorId = eventActorId;
         this.eventSubjectPid = eventSubjectPid;
@@ -76,7 +76,7 @@ public class ActivityRecord extends EventRecordBase {
         this.authEid = authEid;
         this.authMethod = authMethod;
         this.userAgent = userAgent;
-        this.userIP = userIP;
+        this.userIp = userIp;
         Optional<LocalDate> dateOfBirth = computeDOB(this.eventSubjectPid);
         if (dateOfBirth.isPresent()) {
             this.subjectBirthYear = dateOfBirth.get().getYear();
